@@ -1,6 +1,5 @@
 # Agrisense
-
-Complete AI-powered agricultural intelligence platform built from scratch.
+Agrisense is an AI-powered agricultural platform that transforms soil and environmental data into actionable insights. Using ML models, it recommends optimal crops, predicts yield, analyzes profit, and assesses risks. Built with FastAPI and React, it integrates GenAI to deliver clear, strategic farming guidance.
 
 ## Project Structure
 - backend: FastAPI + Scikit-learn + Gemini GenAI
@@ -22,22 +21,22 @@ Complete AI-powered agricultural intelligence platform built from scratch.
 
 ## Setup & Run
 ### Backend
-```
+```bash
 cd backend
 pip install -r requirements.txt
 python run.py
 ```
 *Note: Before running the server, please train the models using files in `backend/training/`*
-```
+```bash
 python backend/training/train_classifier.py
 python backend/training/train_regressor.py
 ```
 
 ### Frontend
-```
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Visit the app at http://localhost:5173
+Visit the app at `http://localhost:5173`
