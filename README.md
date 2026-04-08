@@ -38,5 +38,3 @@ cd frontend
 npm install
 npm run dev
 ```
-
-Visit the app at `http://localhost:5173`
