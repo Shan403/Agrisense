@@ -1,0 +1,22 @@
+% ============================================================
+% Section I: Introduction
+% ============================================================
+
+\section{Introduction}
+
+Agriculture is a fundamental pillar of economic sustenance, especially in agrarian societies such as India, where approximately 58\% of the population depends directly or indirectly on farming activities \cite{fao2023}. Despite technological advancements, a significant proportion of farmers still rely on traditional knowledge and experiential heuristics for critical agricultural decisions---ranging from selecting the right crop to estimating profitability. The consequences of suboptimal decisions manifest as poor yields, financial losses, and unsustainable farming practices \cite{liakos2018}.
+
+The rapid proliferation of machine learning (ML) and artificial intelligence (AI) has opened transformative possibilities for precision agriculture \cite{kamilaris2018}. Supervised learning algorithms, particularly ensemble methods such as Random Forest, have demonstrated strong performance in agricultural prediction tasks including crop recommendation and yield estimation \cite{chlingaryan2018}. Concurrently, the emergence of large language models (LLMs) and generative AI---exemplified by Google's Gemini family of models---offers an unprecedented opportunity to convert numerical predictions into human-interpretable, contextualized advisory narratives \cite{brown2020}.
+
+However, existing agricultural decision support systems (DSS) often suffer from one or more critical limitations: (i) they address only a single facet of agricultural planning (e.g., recommendation or yield prediction in isolation), (ii) they lack intuitive user interfaces accessible to non-technical end-users, (iii) they fail to provide explanatory insights alongside numerical outputs, or (iv) they are monolithic systems that are difficult to scale and maintain \cite{wolfert2017}.
+
+This paper addresses these gaps by presenting \textbf{AgriSense}, an integrated agricultural intelligence platform with the following key contributions:
+
+\begin{enumerate}
+    \item \textbf{Multi-modal ML Pipeline}: A dual-model architecture comprising a Random Forest Classifier for crop recommendation (producing top-3 ranked predictions with probability scores) and a Random Forest Regressor with an automated preprocessing pipeline for crop yield prediction.
+    \item \textbf{Generative AI Integration}: Seamless incorporation of Google Gemini 2.5 Flash to generate context-aware, natural-language agricultural insights directly from model outputs, thereby enhancing interpretability and user trust.
+    \item \textbf{Comprehensive Decision Modules}: Beyond prediction, the platform includes profit analysis, multi-factor risk assessment, and comparative crop profitability evaluation, providing a holistic decision-making toolkit.
+    \item \textbf{Modern Full-Stack Architecture}: A decoupled, microservice-oriented design using FastAPI (Python) for the backend and React/Vite for the frontend, ensuring scalability, maintainability, and an aesthetically rich user experience with interactive data visualizations.
+\end{enumerate}
+
+The remainder of this paper is organized as follows: Section~\ref{sec:related} surveys related work. Section~\ref{sec:methodology} details the system architecture and methodology. Section~\ref{sec:implementation} describes the implementation. Section~\ref{sec:results} presents experimental results. Section~\ref{sec:discussion} provides a discussion, and Section~\ref{sec:conclusion} concludes the paper with future directions.

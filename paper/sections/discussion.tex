@@ -1,0 +1,40 @@
+% ============================================================
+% Section VI: Discussion
+% ============================================================
+
+\section{Discussion}
+\label{sec:discussion}
+
+\subsection{Strengths of the Proposed System}
+AgriSense presents several notable strengths:
+
+\begin{enumerate}
+    \item \textbf{Unified Platform}: Unlike single-purpose agricultural tools, AgriSense integrates prediction, analysis, comparison, and advisory capabilities into a cohesive platform, reducing the cognitive and operational burden on users.
+    \item \textbf{Interpretability through Generative AI}: The Gemini integration transforms opaque ML outputs into actionable, natural-language insights---a critical factor for adoption among farmers with varying levels of technical literacy.
+    \item \textbf{Probabilistic Recommendations}: The top-3 crop recommendations with confidence scores empower farmers to consider alternatives, accounting for market dynamics, resource availability, and risk tolerance.
+    \item \textbf{Modular Architecture}: The SOA-based backend design allows individual modules to be independently developed, tested, and deployed, facilitating incremental enhancements.
+    \item \textbf{Interactive Visualizations}: The use of Recharts for Pie and Bar chart visualizations enhances data comprehension and user engagement.
+\end{enumerate}
+
+\subsection{Limitations and Challenges}
+Several limitations warrant acknowledgment:
+
+\begin{enumerate}
+    \item \textbf{Risk Heuristic Simplicity}: The current risk assessment module relies on a simplistic heuristic based on only two factors (rainfall and fertilizer). A more comprehensive model incorporating soil degradation, pest pressure, market volatility, and climate forecasts would enhance reliability.
+    \item \textbf{Static Model Deployment}: The current architecture uses pre-trained, serialized models without provisions for online learning or periodic retraining. As agricultural conditions evolve, model drift may degrade performance.
+    \item \textbf{Dataset Specificity}: The models are trained on Indian agricultural data, which may limit generalizability to other geographic regions without domain adaptation.
+    \item \textbf{Gemini API Dependency}: The reliance on an external API for insight generation introduces latency and availability concerns. Offline fallback mechanisms or locally deployed LLMs could mitigate this.
+    \item \textbf{Authentication Security}: The current localStorage-based authentication is rudimentary and unsuitable for production deployment without proper token-based authentication (e.g., JWT/OAuth2).
+\end{enumerate}
+
+\subsection{Future Directions}
+Several avenues for future work are identified:
+
+\begin{itemize}
+    \item \textbf{Deep Learning Models}: Exploration of deep neural networks (DNNs), convolutional neural networks (CNNs) for image-based crop health analysis, and recurrent neural networks (RNNs) for time-series yield forecasting.
+    \item \textbf{IoT Integration}: Incorporation of real-time sensor data from IoT-enabled smart farms for dynamic, continuous predictions.
+    \item \textbf{Multilingual Support}: Extension of the Gemini integration to generate insights in regional languages (e.g., Tamil, Hindi, Telugu), enhancing accessibility for rural farmers.
+    \item \textbf{Advanced Risk Modeling}: Integration of weather API data, historical disaster records, and market price feeds to develop a comprehensive, ML-based risk assessment model.
+    \item \textbf{Mobile Application}: Development of a responsive progressive web application (PWA) or native mobile application for field-level access.
+    \item \textbf{Federated Learning}: Privacy-preserving model training across distributed farm data sources to improve model robustness without centralizing sensitive data.
+\end{itemize}

@@ -1,0 +1,1674 @@
+# Master Prompt to Recreate Agrisense
+
+Please create a project named **Agrisense** with the exact files and contents provided below. Do not omit any files, skip over logic, or summarize. Implement everything exactly as shown.
+
+## File: `frontend/src/App.css`
+```
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+```
+
+## File: `frontend/src/App.jsx`
+```
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Login from './pages/Login';
+import Home from './pages/Home';
+import CropRecommendation from './pages/CropRecommendation';
+import YieldPrediction from './pages/YieldPrediction';
+import ProfitAnalysis from './pages/ProfitAnalysis';
+import RiskAssessment from './pages/RiskAssessment';
+import CompareCrops from './pages/CompareCrops';
+
+function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const auth = localStorage.getItem('agrisense_auth');
+    if (auth === 'true') {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  const login = () => {
+    localStorage.setItem('agrisense_auth', 'true');
+    setIsAuthenticated(true);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('agrisense_auth');
+    setIsAuthenticated(false);
+  };
+
+  return (
+    <Router>
+      {isAuthenticated ? (
+        <div className="app-container">
+          <Navbar logout={logout} />
+          <div className="main-content">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/recommend" element={<CropRecommendation />} />
+              <Route path="/yield" element={<YieldPrediction />} />
+              <Route path="/profit" element={<ProfitAnalysis />} />
+              <Route path="/risk" element={<RiskAssessment />} />
+              <Route path="/compare" element={<CompareCrops />} />
+              <Route path="*" element={<Navigate to="/" />} />
+            </Routes>
+          </div>
+        </div>
+      ) : (
+        <Routes>
+          <Route path="/login" element={<Login onLogin={login} />} />
+          <Route path="*" element={<Navigate to="/login" />} />
+        </Routes>
+      )}
+    </Router>
+  );
+}
+
+export default App;
+
+```
+
+## File: `frontend/src/index.css`
+```
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+
+```
+
+## File: `frontend/src/main.jsx`
+```
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App.jsx'
+import './styles/main.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>,
+)
+
+```
+
+## File: `frontend/src/api/api.js`
+```
+import axios from 'axios';
+
+const api = axios.create({
+    baseURL: 'http://localhost:8000/api',
+});
+
+export const recommendCrop = (data) => api.post('/recommend', data);
+export const predictYield = (data) => api.post('/yield', data);
+export const calculateProfit = (data) => api.post('/profit', data);
+export const assessRisk = (data) => api.post('/risk', data);
+export const compareCrops = (data) => api.post('/compare', data);
+export const getAIInsight = (prompt) => api.post('/insight', { prompt });
+
+export default api;
+
+```
+
+## File: `frontend/src/assets/react.svg`
+```
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--logos" width="35.93" height="32" preserveAspectRatio="xMidYMid meet" viewBox="0 0 256 228"><path fill="#00D8FF" d="M210.483 73.824a171.49 171.49 0 0 0-8.24-2.597c.465-1.9.893-3.777 1.273-5.621c6.238-30.281 2.16-54.676-11.769-62.708c-13.355-7.7-35.196.329-57.254 19.526a171.23 171.23 0 0 0-6.375 5.848a155.866 155.866 0 0 0-4.241-3.917C100.759 3.829 77.587-4.822 63.673 3.233C50.33 10.957 46.379 33.89 51.995 62.588a170.974 170.974 0 0 0 1.892 8.48c-3.28.932-6.445 1.924-9.474 2.98C17.309 83.498 0 98.307 0 113.668c0 15.865 18.582 31.778 46.812 41.427a145.52 145.52 0 0 0 6.921 2.165a167.467 167.467 0 0 0-2.01 9.138c-5.354 28.2-1.173 50.591 12.134 58.266c13.744 7.926 36.812-.22 59.273-19.855a145.567 145.567 0 0 0 5.342-4.923a168.064 168.064 0 0 0 6.92 6.314c21.758 18.722 43.246 26.282 56.54 18.586c13.731-7.949 18.194-32.003 12.4-61.268a145.016 145.016 0 0 0-1.535-6.842c1.62-.48 3.21-.974 4.76-1.488c29.348-9.723 48.443-25.443 48.443-41.52c0-15.417-17.868-30.326-45.517-39.844Zm-6.365 70.984c-1.4.463-2.836.91-4.3 1.345c-3.24-10.257-7.612-21.163-12.963-32.432c5.106-11 9.31-21.767 12.459-31.957c2.619.758 5.16 1.557 7.61 2.4c23.69 8.156 38.14 20.213 38.14 29.504c0 9.896-15.606 22.743-40.946 31.14Zm-10.514 20.834c2.562 12.94 2.927 24.64 1.23 33.787c-1.524 8.219-4.59 13.698-8.382 15.893c-8.067 4.67-25.32-1.4-43.927-17.412a156.726 156.726 0 0 1-6.437-5.87c7.214-7.889 14.423-17.06 21.459-27.246c12.376-1.098 24.068-2.894 34.671-5.345a134.17 134.17 0 0 1 1.386 6.193ZM87.276 214.515c-7.882 2.783-14.16 2.863-17.955.675c-8.075-4.657-11.432-22.636-6.853-46.752a156.923 156.923 0 0 1 1.869-8.499c10.486 2.32 22.093 3.988 34.498 4.994c7.084 9.967 14.501 19.128 21.976 27.15a134.668 134.668 0 0 1-4.877 4.492c-9.933 8.682-19.886 14.842-28.658 17.94ZM50.35 144.747c-12.483-4.267-22.792-9.812-29.858-15.863c-6.35-5.437-9.555-10.836-9.555-15.216c0-9.322 13.897-21.212 37.076-29.293c2.813-.98 5.757-1.905 8.812-2.773c3.204 10.42 7.406 21.315 12.477 32.332c-5.137 11.18-9.399 22.249-12.634 32.792a134.718 134.718 0 0 1-6.318-1.979Zm12.378-84.26c-4.811-24.587-1.616-43.134 6.425-47.789c8.564-4.958 27.502 2.111 47.463 19.835a144.318 144.318 0 0 1 3.841 3.545c-7.438 7.987-14.787 17.08-21.808 26.988c-12.04 1.116-23.565 2.908-34.161 5.309a160.342 160.342 0 0 1-1.76-7.887Zm110.427 27.268a347.8 347.8 0 0 0-7.785-12.803c8.168 1.033 15.994 2.404 23.343 4.08c-2.206 7.072-4.956 14.465-8.193 22.045a381.151 381.151 0 0 0-7.365-13.322Zm-45.032-43.861c5.044 5.465 10.096 11.566 15.065 18.186a322.04 322.04 0 0 0-30.257-.006c4.974-6.559 10.069-12.652 15.192-18.18ZM82.802 87.83a323.167 323.167 0 0 0-7.227 13.238c-3.184-7.553-5.909-14.98-8.134-22.152c7.304-1.634 15.093-2.97 23.209-3.984a321.524 321.524 0 0 0-7.848 12.897Zm8.081 65.352c-8.385-.936-16.291-2.203-23.593-3.793c2.26-7.3 5.045-14.885 8.298-22.6a321.187 321.187 0 0 0 7.257 13.246c2.594 4.48 5.28 8.868 8.038 13.147Zm37.542 31.03c-5.184-5.592-10.354-11.779-15.403-18.433c4.902.192 9.899.29 14.978.29c5.218 0 10.376-.117 15.453-.343c-4.985 6.774-10.018 12.97-15.028 18.486Zm52.198-57.817c3.422 7.8 6.306 15.345 8.596 22.52c-7.422 1.694-15.436 3.058-23.88 4.071a382.417 382.417 0 0 0 7.859-13.026a347.403 347.403 0 0 0 7.425-13.565Zm-16.898 8.101a358.557 358.557 0 0 1-12.281 19.815a329.4 329.4 0 0 1-23.444.823c-7.967 0-15.716-.248-23.178-.732a310.202 310.202 0 0 1-12.513-19.846h.001a307.41 307.41 0 0 1-10.923-20.627a310.278 310.278 0 0 1 10.89-20.637l-.001.001a307.318 307.318 0 0 1 12.413-19.761c7.613-.576 15.42-.876 23.31-.876H128c7.926 0 15.743.303 23.354.883a329.357 329.357 0 0 1 12.335 19.695a358.489 358.489 0 0 1 11.036 20.54a329.472 329.472 0 0 1-11 20.722Zm22.56-122.124c8.572 4.944 11.906 24.881 6.52 51.026c-.344 1.668-.73 3.367-1.15 5.09c-10.622-2.452-22.155-4.275-34.23-5.408c-7.034-10.017-14.323-19.124-21.64-27.008a160.789 160.789 0 0 1 5.888-5.4c18.9-16.447 36.564-22.941 44.612-18.3ZM128 90.808c12.625 0 22.86 10.235 22.86 22.86s-10.235 22.86-22.86 22.86s-22.86-10.235-22.86-22.86s10.235-22.86 22.86-22.86Z"></path></svg>
+```
+
+## File: `frontend/src/components/AIInsightButton.jsx`
+```
+import React, { useState } from 'react';
+import { Sparkles, Loader } from 'lucide-react';
+import { getAIInsight } from '../api/api';
+
+const AIInsightButton = ({ prompt, contextData }) => {
+    const [insight, setInsight] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const fetchInsight = async () => {
+        setLoading(true);
+        try {
+            const fullPrompt = `${prompt} Context data: ${JSON.stringify(contextData)}`;
+            const response = await getAIInsight(fullPrompt);
+            setInsight(response.data.insight);
+        } catch (error) {
+            setInsight('Failed to load AI insight. Please check your backend connection and API key.');
+        }
+        setLoading(false);
+    };
+
+    return (
+        <div style={{ marginTop: '2rem' }}>
+            <button className="btn btn-insight" onClick={fetchInsight} disabled={loading}>
+                {loading ? <Loader className="spin" size={18} /> : <Sparkles size={18} />}
+                Get AI Insight
+            </button>
+
+            {insight && (
+                <div className="insight-box">
+                    <strong>AI Insight:</strong>
+                    <p style={{ marginTop: '0.5rem', whiteSpace: 'pre-wrap' }}>{insight}</p>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default AIInsightButton;
+
+```
+
+## File: `frontend/src/components/Navbar.jsx`
+```
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+import { Leaf, Navigation, ArrowRight, DollarSign, Umbrella, ArrowLeftRight, LogOut, Home } from 'lucide-react';
+
+const Navbar = ({ logout }) => {
+    return (
+        <div className="sidebar">
+            <div className="sidebar-logo">
+                <Leaf style={{ marginRight: '10px' }} />
+                Agrisense
+            </div>
+            <div className="nav-links">
+                <NavLink to="/" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                    <Home size={20} />
+                    Home
+                </NavLink>
+                <NavLink to="/recommend" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                    <Navigation size={20} />
+                    Recommendation
+                </NavLink>
+                <NavLink to="/yield" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                    <ArrowRight size={20} />
+                    Yield Prediction
+                </NavLink>
+                <NavLink to="/profit" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                    <DollarSign size={20} />
+                    Profit Analysis
+                </NavLink>
+                <NavLink to="/risk" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                    <Umbrella size={20} />
+                    Risk Assessment
+                </NavLink>
+                <NavLink to="/compare" className={({ isActive }) => isActive ? "nav-item active" : "nav-item"}>
+                    <ArrowLeftRight size={20} />
+                    Compare Crops
+                </NavLink>
+
+                <a href="#" onClick={logout} className="nav-item logout">
+                    <LogOut size={20} />
+                    Logout
+                </a>
+            </div>
+        </div>
+    );
+};
+
+export default Navbar;
+
+```
+
+## File: `frontend/src/pages/CompareCrops.jsx`
+```
+import React, { useState } from 'react';
+import { compareCrops } from '../api/api';
+import AIInsightButton from '../components/AIInsightButton';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Legend } from 'recharts';
+
+const CompareCrops = () => {
+    const [formData, setFormData] = useState({
+        crop1: { name: 'Rice', estimated_yield: 25, market_price: 200, cost: 2000 },
+        crop2: { name: 'Maize', estimated_yield: 30, market_price: 150, cost: 1800 }
+    });
+    const [result, setResult] = useState(null);
+
+    const handleCrop1Change = (e) => {
+        let value = e.target.value;
+        if (e.target.type === 'number') value = Number(value);
+        setFormData({ ...formData, crop1: { ...formData.crop1, [e.target.name]: value } });
+    };
+
+    const handleCrop2Change = (e) => {
+        let value = e.target.value;
+        if (e.target.type === 'number') value = Number(value);
+        setFormData({ ...formData, crop2: { ...formData.crop2, [e.target.name]: value } });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await compareCrops(formData);
+            setResult(res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const chartData = result ? [
+        {
+            name: 'Profit Comparison',
+            [result.crop1.name]: result.crop1.profit,
+            [result.crop2.name]: result.crop2.profit
+        }
+    ] : [];
+
+    return (
+        <div>
+            <div className="page-header">
+                <h1 className="page-title">Compare Crops</h1>
+                <p style={{ color: 'var(--text-muted)' }}>Compare the profitability of two crops side-by-side.</p>
+            </div>
+
+            <div className="dashboard-grid">
+                <div className="glass-card" style={{ gridColumn: '1 / -1' }}>
+                    <form onSubmit={handleSubmit}>
+                        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+
+                            {/* Crop 1 */}
+                            <div style={{ flex: 1, minWidth: '300px', padding: '1rem', border: '1px solid var(--glass-border)', borderRadius: '8px' }}>
+                                <h3 style={{ marginBottom: '1rem' }}>Crop 1</h3>
+                                <div className="form-group">
+                                    <label>Name</label>
+                                    <input type="text" name="name" value={formData.crop1.name} onChange={handleCrop1Change} className="form-control" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Estimated Yield</label>
+                                    <input type="number" step="0.1" name="estimated_yield" value={formData.crop1.estimated_yield} onChange={handleCrop1Change} className="form-control" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Market Price</label>
+                                    <input type="number" step="0.1" name="market_price" value={formData.crop1.market_price} onChange={handleCrop1Change} className="form-control" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Total Cost</label>
+                                    <input type="number" step="0.1" name="cost" value={formData.crop1.cost} onChange={handleCrop1Change} className="form-control" />
+                                </div>
+                            </div>
+
+                            {/* Crop 2 */}
+                            <div style={{ flex: 1, minWidth: '300px', padding: '1rem', border: '1px solid var(--glass-border)', borderRadius: '8px' }}>
+                                <h3 style={{ marginBottom: '1rem' }}>Crop 2</h3>
+                                <div className="form-group">
+                                    <label>Name</label>
+                                    <input type="text" name="name" value={formData.crop2.name} onChange={handleCrop2Change} className="form-control" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Estimated Yield</label>
+                                    <input type="number" step="0.1" name="estimated_yield" value={formData.crop2.estimated_yield} onChange={handleCrop2Change} className="form-control" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Market Price</label>
+                                    <input type="number" step="0.1" name="market_price" value={formData.crop2.market_price} onChange={handleCrop2Change} className="form-control" />
+                                </div>
+                                <div className="form-group">
+                                    <label>Total Cost</label>
+                                    <input type="number" step="0.1" name="cost" value={formData.crop2.cost} onChange={handleCrop2Change} className="form-control" />
+                                </div>
+                            </div>
+
+                        </div>
+                        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
+                            <button type="submit" className="btn btn-primary" style={{ padding: '1rem 3rem' }}>Compare Profitability</button>
+                        </div>
+                    </form>
+                </div>
+
+                {result && (
+                    <div className="glass-card" style={{ gridColumn: '1 / -1' }}>
+                        <h3>Comparison Results</h3>
+
+                        <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap', marginTop: '1.5rem' }}>
+                            <div style={{ flex: 1 }}>
+                                <p style={{ fontSize: '1.2rem', marginBottom: '1rem' }}>
+                                    Status: <strong>{result.comparison.better_crop}</strong> is more profitable by <strong>${result.comparison.profit_difference}</strong>.
+                                </p>
+
+                                <AIInsightButton
+                                    prompt={`Act as an agricultural economics expert. Compare ${result.crop1.name} (Profit: $${result.crop1.profit}) and ${result.crop2.name} (Profit: $${result.crop2.profit}). Explain the economic factors behind this difference and give advice on which one a farmer should plant.`}
+                                    contextData={result}
+                                />
+                            </div>
+
+                            <div style={{ flex: 1, minWidth: '300px' }} className="chart-container">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={chartData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                                        <XAxis dataKey="name" stroke="white" />
+                                        <YAxis stroke="white" />
+                                        <Tooltip wrapperStyle={{ backgroundColor: '#1e1e1e', border: 'none' }} />
+                                        <Legend />
+                                        <Bar dataKey={result.crop1.name} fill="var(--primary-color)" radius={[4, 4, 0, 0]} />
+                                        <Bar dataKey={result.crop2.name} fill="#4db6ac" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default CompareCrops;
+
+```
+
+## File: `frontend/src/pages/CropRecommendation.jsx`
+```
+import React, { useState } from 'react';
+import { recommendCrop } from '../api/api';
+import AIInsightButton from '../components/AIInsightButton';
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+
+const COLORS = ['#2e7d32', '#81c784', '#ffb300'];
+
+const CropRecommendation = () => {
+    const [formData, setFormData] = useState({
+        N: 90, P: 42, K: 43, temperature: 20.8, humidity: 82, ph: 6.5, rainfall: 202.9
+    });
+    const [results, setResults] = useState(null);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: Number(e.target.value) });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await recommendCrop(formData);
+            setResults(res.data.top_3);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    return (
+        <div>
+            <div className="page-header">
+                <h1 className="page-title">Crop Recommendation</h1>
+                <p style={{ color: 'var(--text-muted)' }}>Predict the top 3 best matching crops based on soil and climate.</p>
+            </div>
+
+            <div className="dashboard-grid">
+                <div className="glass-card">
+                    <h3>Input Parameters</h3>
+                    <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="form-group">
+                                <label>Nitrogen (N)</label>
+                                <input type="number" name="N" value={formData.N} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                                <label>Phosphorous (P)</label>
+                                <input type="number" name="P" value={formData.P} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                                <label>Potassium (K)</label>
+                                <input type="number" name="K" value={formData.K} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                                <label>Temperature (°C)</label>
+                                <input type="number" step="0.1" name="temperature" value={formData.temperature} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                                <label>Humidity (%)</label>
+                                <input type="number" step="0.1" name="humidity" value={formData.humidity} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                                <label>pH</label>
+                                <input type="number" step="0.1" name="ph" value={formData.ph} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                <label>Rainfall (mm)</label>
+                                <input type="number" step="0.1" name="rainfall" value={formData.rainfall} onChange={handleChange} className="form-control" />
+                            </div>
+                        </div>
+                        <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>Predict Crops</button>
+                    </form>
+                </div>
+
+                {results && (
+                    <div className="glass-card">
+                        <h3>Prediction Results</h3>
+                        <div className="chart-container">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <PieChart>
+                                    <Pie
+                                        data={results}
+                                        dataKey="probability"
+                                        nameKey="crop"
+                                        cx="50%"
+                                        cy="50%"
+                                        innerRadius={60}
+                                        outerRadius={80}
+                                        label
+                                    >
+                                        {results.map((entry, index) => (
+                                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip formatter={(value) => `${(value * 100).toFixed(1)}%`} />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                        <div style={{ marginTop: '1rem' }}>
+                            {results.map((r, i) => (
+                                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem', borderBottom: '1px solid var(--glass-border)' }}>
+                                    <span>{i + 1}. {r.crop}</span>
+                                    <span style={{ fontWeight: 'bold', color: COLORS[i] }}>{(r.probability * 100).toFixed(1)}%</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        <AIInsightButton
+                            prompt={`Explain why ${results[0].crop} is the most recommended crop based on N:${formData.N} P:${formData.P} K:${formData.K}, temp:${formData.temperature}°C, humidity:${formData.humidity}%, ph:${formData.ph}, and rainfall:${formData.rainfall}mm.`}
+                            contextData={results}
+                        />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default CropRecommendation;
+
+```
+
+## File: `frontend/src/pages/Home.jsx`
+```
+import React from 'react';
+import { Activity, Server, Layout } from 'lucide-react';
+
+const Home = () => {
+    return (
+        <div>
+            <div className="page-header">
+                <h1 className="page-title">Dashboard Overview</h1>
+                <p style={{ color: 'var(--text-muted)' }}>Welcome to your AI-powered agricultural intelligence platform.</p>
+            </div>
+
+            <div className="dashboard-grid">
+                <div className="glass-card">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                        <Activity color="var(--accent)" size={28} />
+                        <h3>Active Models</h3>
+                    </div>
+                    <p style={{ fontSize: '2rem', fontWeight: 'bold' }}>2</p>
+                    <p style={{ color: 'var(--text-muted)' }}>Random Forest models deployed</p>
+                </div>
+
+                <div className="glass-card">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                        <Server color="var(--success)" size={28} />
+                        <h3>System Status</h3>
+                    </div>
+                    <p style={{ fontSize: '2rem', fontWeight: 'bold', color: 'var(--success)' }}>Online</p>
+                    <p style={{ color: 'var(--text-muted)' }}>FastAPI backend connected</p>
+                </div>
+
+                <div className="glass-card">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1rem' }}>
+                        <Layout color="#4a00e0" size={28} />
+                        <h3>Modules Available</h3>
+                    </div>
+                    <p style={{ fontSize: '2rem', fontWeight: 'bold' }}>5</p>
+                    <p style={{ color: 'var(--text-muted)' }}>Prediction, Analysis, Compare tools</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default Home;
+
+```
+
+## File: `frontend/src/pages/Login.jsx`
+```
+import React, { useState } from 'react';
+import { Leaf } from 'lucide-react';
+
+const Login = ({ onLogin }) => {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (username && password) {
+            onLogin();
+        }
+    };
+
+    return (
+        <div className="auth-page">
+            <div className="glass-card auth-card">
+                <Leaf size={48} color="#81c784" style={{ marginBottom: '1rem' }} />
+                <h1 style={{ marginBottom: '2rem' }}>Agrisense Login</h1>
+                <form onSubmit={handleSubmit} autoComplete="off">
+                    <div className="form-group" style={{ textAlign: 'left' }}>
+                        <label>Username</label>
+                        <input
+                            type="text"
+                            className="form-control"
+                            value={username}
+                            onChange={e => setUsername(e.target.value)}
+                            placeholder="Enter any username"
+                            autoComplete="new-password"
+                        />
+                    </div>
+                    <div className="form-group" style={{ textAlign: 'left' }}>
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            className="form-control"
+                            value={password}
+                            onChange={e => setPassword(e.target.value)}
+                            placeholder="Enter any password"
+                            autoComplete="new-password"
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '1rem' }}>
+                        Login to Dashboard
+                    </button>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+export default Login;
+
+```
+
+## File: `frontend/src/pages/ProfitAnalysis.jsx`
+```
+import React, { useState } from 'react';
+import { calculateProfit } from '../api/api';
+import AIInsightButton from '../components/AIInsightButton';
+
+const ProfitAnalysis = () => {
+    const [formData, setFormData] = useState({
+        estimated_yield: 10, market_price: 2000, cost: 5000
+    });
+    const [result, setResult] = useState(null);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: Number(e.target.value) });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await calculateProfit(formData);
+            setResult(res.data);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    return (
+        <div>
+            <div className="page-header">
+                <h1 className="page-title">Profit Analysis</h1>
+                <p style={{ color: 'var(--text-muted)' }}>Calculate estimated farming profit.</p>
+            </div>
+
+            <div className="dashboard-grid">
+                <div className="glass-card">
+                    <h3>Input Parameters</h3>
+                    <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
+                        <div className="form-group">
+                            <label>Estimated Yield (units)</label>
+                            <input type="number" step="0.1" name="estimated_yield" value={formData.estimated_yield} onChange={handleChange} className="form-control" />
+                        </div>
+                        <div className="form-group">
+                            <label>Market Price (per unit)</label>
+                            <input type="number" step="0.1" name="market_price" value={formData.market_price} onChange={handleChange} className="form-control" />
+                        </div>
+                        <div className="form-group">
+                            <label>Total Cost</label>
+                            <input type="number" step="0.1" name="cost" value={formData.cost} onChange={handleChange} className="form-control" />
+                        </div>
+                        <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>Calculate Profit</button>
+                    </form>
+                </div>
+
+                {result && (
+                    <div className="glass-card">
+                        <h3>Calculated Result</h3>
+                        <div style={{ marginTop: '2rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                <span>Gross Revenue:</span>
+                                <span style={{ fontWeight: 'bold' }}>${(result.estimated_yield * result.market_price).toFixed(2)}</span>
+                            </div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                <span>Total Cost:</span>
+                                <span style={{ fontWeight: 'bold', color: 'var(--danger)' }}>-${result.cost.toFixed(2)}</span>
+                            </div>
+                            <hr style={{ borderColor: 'var(--glass-border)', margin: '1rem 0' }} />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem' }}>
+                                <span>Net Profit:</span>
+                                <span className={result.profit >= 0 ? "profit-positive" : "profit-negative"} style={{ fontWeight: 'bold', fontSize: '1.5rem' }}>
+                                    ${result.profit.toFixed(2)}
+                                </span>
+                            </div>
+                        </div>
+
+                        <AIInsightButton
+                            prompt={`Provide agricultural insights on a simulated profit of $${result.profit} based on an estimated yield of ${result.estimated_yield}, market price $${result.market_price}, and production cost of $${result.cost}.`}
+                            contextData={result}
+                        />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default ProfitAnalysis;
+
+```
+
+## File: `frontend/src/pages/RiskAssessment.jsx`
+```
+import React, { useState } from 'react';
+import { assessRisk } from '../api/api';
+import AIInsightButton from '../components/AIInsightButton';
+
+const RiskAssessment = () => {
+    const [formData, setFormData] = useState({
+        rainfall: 1500, fertilizer: 100
+    });
+    const [result, setResult] = useState(null);
+
+    const handleChange = (e) => {
+        setFormData({ ...formData, [e.target.name]: Number(e.target.value) });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await assessRisk(formData);
+            setResult(res.data.risk_level);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const getRiskColor = (level) => {
+        if (level === 'High') return 'var(--danger)';
+        if (level === 'Medium') return 'var(--accent)';
+        return 'var(--success)';
+    };
+
+    return (
+        <div>
+            <div className="page-header">
+                <h1 className="page-title">Risk Assessment</h1>
+                <p style={{ color: 'var(--text-muted)' }}>Display a risk level indicator based on field factors.</p>
+            </div>
+
+            <div className="dashboard-grid">
+                <div className="glass-card">
+                    <h3>Input Parameters</h3>
+                    <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
+                        <div className="form-group">
+                            <label>Annual Rainfall (mm)</label>
+                            <input type="number" step="0.1" name="rainfall" value={formData.rainfall} onChange={handleChange} className="form-control" />
+                        </div>
+                        <div className="form-group">
+                            <label>Fertilizer Input (kg)</label>
+                            <input type="number" step="0.1" name="fertilizer" value={formData.fertilizer} onChange={handleChange} className="form-control" />
+                        </div>
+                        <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>Assess Risk</button>
+                    </form>
+                </div>
+
+                {result && (
+                    <div className="glass-card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <h3>Risk Indicator</h3>
+
+                        <div style={{
+                            width: '150px', height: '150px', borderRadius: '50%',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            border: `10px solid ${getRiskColor(result)}`,
+                            marginTop: '2rem', marginBottom: '2rem',
+                            boxShadow: `0 0 20px ${getRiskColor(result)}50`
+                        }}>
+                            <span style={{ fontSize: '2rem', fontWeight: 'bold', color: getRiskColor(result) }}>{result}</span>
+                        </div>
+
+                        <AIInsightButton
+                            prompt={`Explain why an agricultural risk assessment tool would return a ${result} risk level for a crop receiving ${formData.rainfall}mm of rainfall and ${formData.fertilizer}kg of fertilizer.`}
+                            contextData={{ result, formData }}
+                        />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default RiskAssessment;
+
+```
+
+## File: `frontend/src/pages/YieldPrediction.jsx`
+```
+import React, { useState } from 'react';
+import { predictYield } from '../api/api';
+import AIInsightButton from '../components/AIInsightButton';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+
+const YieldPrediction = () => {
+    const [formData, setFormData] = useState({
+        crop: 'Rice', season: 'Kharif     ', state: 'Assam', area: 100000,
+        rainfall: 2000.0, fertilizer: 7000000, pesticide: 20000
+    });
+    const [result, setResult] = useState(null);
+
+    const handleChange = (e) => {
+        let value = e.target.value;
+        if (e.target.type === 'number') {
+            value = Number(value);
+        }
+        setFormData({ ...formData, [e.target.name]: value });
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const res = await predictYield(formData);
+            setResult(res.data.estimated_yield);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    return (
+        <div>
+            <div className="page-header">
+                <h1 className="page-title">Yield Prediction</h1>
+                <p style={{ color: 'var(--text-muted)' }}>Estimate your crop yield based on field data.</p>
+            </div>
+
+            <div className="dashboard-grid">
+                <div className="glass-card">
+                    <h3>Input Parameters</h3>
+                    <form onSubmit={handleSubmit} style={{ marginTop: '1.5rem' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div className="form-group">
+                                <label>Crop</label>
+                                <input type="text" name="crop" value={formData.crop} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                                <label>Season</label>
+                                <input type="text" name="season" value={formData.season} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                                <label>State</label>
+                                <input type="text" name="state" value={formData.state} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                                <label>Area (Hectares)</label>
+                                <input type="number" name="area" value={formData.area} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                                <label>Annual Rainfall (mm)</label>
+                                <input type="number" name="rainfall" value={formData.rainfall} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group">
+                                <label>Fertilizer (kg)</label>
+                                <input type="number" name="fertilizer" value={formData.fertilizer} onChange={handleChange} className="form-control" />
+                            </div>
+                            <div className="form-group" style={{ gridColumn: '1 / -1' }}>
+                                <label>Pesticide (kg)</label>
+                                <input type="number" name="pesticide" value={formData.pesticide} onChange={handleChange} className="form-control" />
+                            </div>
+                        </div>
+                        <button type="submit" className="btn btn-primary" style={{ marginTop: '1rem' }}>Predict Yield</button>
+                    </form>
+                </div>
+
+                {result !== null && (
+                    <div className="glass-card">
+                        <h3>Estimated Yield</h3>
+                        <p className="result-display" style={{ color: 'var(--accent)', fontSize: '2.5rem', fontWeight: 'bold' }}>
+                            {result} <span style={{ fontSize: '1rem', color: 'var(--text-muted)' }}>metric tons</span>
+                        </p>
+
+                        <div className="chart-container">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={[{ name: 'Yield', value: result }]}>
+                                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                                    <XAxis dataKey="name" stroke="white" />
+                                    <YAxis stroke="white" />
+                                    <Tooltip wrapperStyle={{ backgroundColor: '#1e1e1e', border: 'none' }} />
+                                    <Bar dataKey="value" fill="var(--secondary-color)" radius={[4, 4, 0, 0]} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        <AIInsightButton
+                            prompt={`Explain what an estimated yield of ${result} metric tons means for ${formData.crop} over an area of ${formData.area} hectares in ${formData.state} during ${formData.season}. Are there any tips to improve this?`}
+                            contextData={{ result, formData }}
+                        />
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default YieldPrediction;
+
+```
+
+## File: `frontend/src/styles/main.css`
+```
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --primary-color: #2e7d32;
+  --secondary-color: #81c784;
+  --bg-dark: #121212;
+  --bg-panel: #1e1e1e;
+  --text-light: #ffffff;
+  --text-muted: #b0bec5;
+  --accent: #ffb300;
+  --danger: #e53935;
+  --success: #43a047;
+  --glass-bg: rgba(30, 30, 30, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  
+  --transition: all 0.3s ease;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-dark);
+  color: var(--text-light);
+  min-height: 100vh;
+  margin: 0;
+}
+
+/* App Layout */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+  margin-left: 250px;
+}
+
+/* Navbar Sidebar */
+.sidebar {
+  width: 250px;
+  background-color: var(--bg-panel);
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--glass-border);
+  z-index: 100;
+}
+
+.sidebar-logo {
+  padding: 2rem 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.nav-links {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 0;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: 1rem 1.5rem;
+  font-weight: 500;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.nav-item:hover, .nav-item.active {
+  color: var(--text-light);
+  background-color: rgba(129, 199, 132, 0.1);
+  border-right: 4px solid var(--secondary-color);
+}
+
+.nav-item.logout {
+  margin-top: auto;
+  color: var(--danger);
+}
+
+/* Cards & Glashmorphism */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Forms */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--text-light);
+  font-family: 'Inter', sans-serif;
+  transition: var(--transition);
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #1b5e20;
+  box-shadow: 0 0 15px rgba(46, 125, 50, 0.5);
+}
+
+.btn-insight {
+  background: linear-gradient(45deg, #8e2de2, #4a00e0);
+  color: white;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.btn-insight:hover {
+  box-shadow: 0 0 20px rgba(142, 45, 226, 0.6);
+}
+
+/* Page Headers */
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(90deg, var(--secondary-color), #4db6ac);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+/* Auth Page */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--bg-dark), #1b5e20);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+/* Insight Modal/Box */
+.insight-box {
+  margin-top: 1rem;
+  padding: 1.5rem;
+  background: rgba(142, 45, 226, 0.1);
+  border-left: 4px solid #8e2de2;
+  border-radius: 4px 8px 8px 4px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+/* Charts */
+.chart-container {
+  height: 300px;
+  margin-top: 2rem;
+}
+
+/* Results */
+.result-display {
+  margin-top: 2rem;
+  font-size: 1.2rem;
+}
+
+.profit-positive { color: var(--success); }
+.profit-negative { color: var(--danger); }
+
+```
+
+## File: `backend/app/main.py`
+```
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from .routes import recommend, profit, risk, compare
+# 'yield' is a reserved keyword in Python, so the file might be named yield.py but we import it differently or rename it.
+# Wait, 'yield' is a keyword, we cannot import it as 'yield'. We can import it as yield_route and use importlib or name it yield_route.py. But the user asked for 'yield.py'.
+# We can import it using: from .routes import yield_route (if we rename it), but user specified `yield.py`. 
+# To import a module named `yield.py`, we can use importlib.
+import importlib
+
+yield_module = importlib.import_module('.routes.yield', package='app')
+
+app = FastAPI(title="Agrisense API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+import os
+import google.generativeai as genai
+from pydantic import BaseModel
+from dotenv import load_dotenv
+
+load_dotenv(os.path.join(os.path.dirname(__file__), '../../.env'))
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+
+app.include_router(recommend.router, prefix="/api")
+app.include_router(yield_module.router, prefix="/api")
+app.include_router(profit.router, prefix="/api")
+app.include_router(risk.router, prefix="/api")
+app.include_router(compare.router, prefix="/api")
+
+class InsightRequest(BaseModel):
+    prompt: str
+
+@app.post("/api/insight")
+def get_ai_insight(req: InsightRequest):
+    try:
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(req.prompt)
+        return {"insight": response.text}
+    except Exception as e:
+        return {"insight": f"AI Insight is currently unavailable: {str(e)}"}
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to Agrisense API"}
+
+```
+
+## File: `backend/app/routes/compare.py`
+```
+from fastapi import APIRouter
+from pydantic import BaseModel
+from ..services.compare_service import CompareService
+
+router = APIRouter()
+service = CompareService()
+
+class CropDetail(BaseModel):
+    name: str
+    estimated_yield: float
+    market_price: float
+    cost: float
+
+class CompareRequest(BaseModel):
+    crop1: CropDetail
+    crop2: CropDetail
+
+@router.post("/compare")
+def compare_crops(req: CompareRequest):
+    return service.compare_crops(req.crop1.dict(), req.crop2.dict())
+
+```
+
+## File: `backend/app/routes/profit.py`
+```
+from fastapi import APIRouter
+from pydantic import BaseModel
+from ..services.profit_service import ProfitService
+
+router = APIRouter()
+service = ProfitService()
+
+class ProfitRequest(BaseModel):
+    estimated_yield: float
+    market_price: float
+    cost: float
+
+@router.post("/profit")
+def calculate_profit(req: ProfitRequest):
+    return service.calculate_profit(req.estimated_yield, req.market_price, req.cost)
+
+```
+
+## File: `backend/app/routes/recommend.py`
+```
+from fastapi import APIRouter
+from pydantic import BaseModel
+from ..services.recommendation_service import RecommendationService
+
+router = APIRouter()
+service = RecommendationService()
+
+class RecommendRequest(BaseModel):
+    N: float
+    P: float
+    K: float
+    temperature: float
+    humidity: float
+    ph: float
+    rainfall: float
+
+@router.post("/recommend")
+def recommend_crop(req: RecommendRequest):
+    return service.recommend_crop(
+        req.N, req.P, req.K,
+        req.temperature, req.humidity, req.ph, req.rainfall
+    )
+
+```
+
+## File: `backend/app/routes/risk.py`
+```
+from fastapi import APIRouter
+from pydantic import BaseModel
+from ..services.risk_service import RiskService
+
+router = APIRouter()
+service = RiskService()
+
+class RiskRequest(BaseModel):
+    rainfall: float
+    fertilizer: float
+
+@router.post("/risk")
+def calculate_risk(req: RiskRequest):
+    return service.calculate_risk(req.rainfall, req.fertilizer)
+
+```
+
+## File: `backend/app/routes/yield.py`
+```
+from fastapi import APIRouter
+from pydantic import BaseModel
+from ..services.yield_service import YieldService
+
+router = APIRouter()
+service = YieldService()
+
+class YieldRequest(BaseModel):
+    crop: str
+    season: str
+    state: str
+    area: float
+    rainfall: float
+    fertilizer: float
+    pesticide: float
+
+@router.post("/yield")
+def predict_yield(req: YieldRequest):
+    return service.predict_yield(
+        req.crop, req.season, req.state,
+        req.area, req.rainfall, req.fertilizer, req.pesticide
+    )
+
+```
+
+## File: `backend/app/services/compare_service.py`
+```
+class CompareService:
+    def compare_crops(self, crop1, crop2):
+        profit1 = (crop1['estimated_yield'] * crop1['market_price']) - crop1['cost']
+        profit2 = (crop2['estimated_yield'] * crop2['market_price']) - crop2['cost']
+        
+        diff = abs(profit1 - profit2)
+        better_crop = crop1['name'] if profit1 > profit2 else crop2['name']
+        
+        return {
+            "crop1": {"name": crop1['name'], "profit": round(profit1, 2)},
+            "crop2": {"name": crop2['name'], "profit": round(profit2, 2)},
+            "comparison": {
+                "better_crop": better_crop,
+                "profit_difference": round(diff, 2)
+            }
+        }
+
+```
+
+## File: `backend/app/services/profit_service.py`
+```
+class ProfitService:
+    def calculate_profit(self, estimated_yield, market_price, cost):
+        profit = (estimated_yield * market_price) - cost
+        return {
+            "estimated_yield": estimated_yield,
+            "market_price": market_price,
+            "cost": cost,
+            "profit": round(profit, 2)
+        }
+
+```
+
+## File: `backend/app/services/recommendation_service.py`
+```
+import pickle
+import os
+import numpy as np
+
+class RecommendationService:
+    def __init__(self):
+        self.model_path = os.path.join(os.path.dirname(__file__), '../models/crop_model.pkl')
+        self.le_path = os.path.join(os.path.dirname(__file__), '../models/label_encoder.pkl')
+        self.model = None
+        self.le = None
+
+        if os.path.exists(self.model_path) and os.path.exists(self.le_path):
+            with open(self.model_path, 'rb') as f:
+                self.model = pickle.load(f)
+            with open(self.le_path, 'rb') as f:
+                self.le = pickle.load(f)
+
+    def recommend_crop(self, N, P, K, temperature, humidity, ph, rainfall):
+        if not self.model or not self.le:
+            return {"error": "Models not found. Train models first."}
+        
+        features = np.array([[N, P, K, temperature, humidity, ph, rainfall]])
+        
+        # Use predict_proba
+        probabilities = self.model.predict_proba(features)[0]
+        
+        # Get top 3 indices
+        top_indices = probabilities.argsort()[-3:][::-1]
+        
+        top_3 = []
+        for idx in top_indices:
+            crop = self.le.inverse_transform([idx])[0]
+            prob = round(float(probabilities[idx]), 4)
+            top_3.append({
+                "crop": str(crop).capitalize(),
+                "probability": prob
+            })
+            
+        return {"top_3": top_3}
+
+```
+
+## File: `backend/app/services/risk_service.py`
+```
+class RiskService:
+    def calculate_risk(self, rainfall, fertilizer):
+        # A simple dummy heuristic for risk calculation
+        risk_score = 0
+
+        # Excessive or very low rainfall might induce risk
+        if rainfall < 500 or rainfall > 2500:
+            risk_score += 2
+        elif rainfall < 1000 or rainfall > 2000:
+            risk_score += 1
+            
+        # Too little fertilizer could mean lower yield, thus higher risk
+        if fertilizer < 50:
+            risk_score += 2
+        elif fertilizer < 100:
+            risk_score += 1
+            
+        if risk_score >= 3:
+            return {"risk_level": "High"}
+        elif risk_score == 2:
+            return {"risk_level": "Medium"}
+        else:
+            return {"risk_level": "Low"}
+
+```
+
+## File: `backend/app/services/yield_service.py`
+```
+import pickle
+import os
+import pandas as pd
+
+class YieldService:
+    def __init__(self):
+        self.model_path = os.path.join(os.path.dirname(__file__), '../models/yield_model.pkl')
+        self.model = None
+
+        if os.path.exists(self.model_path):
+            with open(self.model_path, 'rb') as f:
+                self.model = pickle.load(f)
+
+    def predict_yield(self, crop, season, state, area, rainfall, fertilizer, pesticide):
+        if not self.model:
+            return {"error": "Yield model not found. Train model first."}
+        
+        input_df = pd.DataFrame([{
+            "Crop": crop,
+            "Season": season,
+            "State": state,
+            "Area": area,
+            "Annual_Rainfall": rainfall,
+            "Fertilizer": fertilizer,
+            "Pesticide": pesticide
+        }])
+        
+        pred = self.model.predict(input_df)[0]
+        return {"estimated_yield": round(float(pred), 2)}
+
+```
+
+## File: `backend/training/train_classifier.py`
+```
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder
+import pickle
+import os
+
+def train():
+    data_path = os.path.join(os.path.dirname(__file__), '../app/data/crop_recommendation.csv')
+    model_dir = os.path.join(os.path.dirname(__file__), '../app/models')
+    
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+
+    df = pd.read_csv(data_path)
+    X = df[['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']]
+    y = df['label']
+
+    le = LabelEncoder()
+    y_encoded = le.fit_transform(y)
+
+    clf = RandomForestClassifier(n_estimators=100, random_state=42)
+    clf.fit(X, y_encoded)
+
+    with open(os.path.join(model_dir, 'crop_model.pkl'), 'wb') as f:
+        pickle.dump(clf, f)
+
+    with open(os.path.join(model_dir, 'label_encoder.pkl'), 'wb') as f:
+        pickle.dump(le, f)
+        
+    print("Classifier trained successfully!")
+
+if __name__ == "__main__":
+    train()
+
+```
+
+## File: `backend/training/train_regressor.py`
+```
+import pandas as pd
+import numpy as np
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.pipeline import Pipeline
+import pickle
+import os
+
+def train():
+    data_path = os.path.join(os.path.dirname(__file__), '../app/data/crop_yield.csv')
+    model_dir = os.path.join(os.path.dirname(__file__), '../app/models')
+
+    if not os.path.exists(model_dir):
+        os.makedirs(model_dir)
+
+    df = pd.read_csv(data_path)
+    
+    # We predict Yield based on other features except Production and Crop_Year
+    categorical_features = ['Crop', 'Season', 'State']
+    numeric_features = ['Area', 'Annual_Rainfall', 'Fertilizer', 'Pesticide']
+    
+    X = df[categorical_features + numeric_features]
+    y = df['Yield']
+
+    preprocessor = ColumnTransformer(
+        transformers=[
+            ('cat', OneHotEncoder(handle_unknown='ignore'), categorical_features)
+        ],
+        remainder='passthrough'
+    )
+
+    pipeline = Pipeline(steps=[
+        ('preprocessor', preprocessor),
+        ('regressor', RandomForestRegressor(n_estimators=50, random_state=42))
+    ])
+
+    pipeline.fit(X, y)
+
+    with open(os.path.join(model_dir, 'yield_model.pkl'), 'wb') as f:
+        pickle.dump(pipeline, f)
+
+    print("Regressor trained successfully!")
+
+if __name__ == "__main__":
+    train()
+
+```
+
+## File: `frontend/package.json`
+```
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "axios": "^1.13.6",
+    "lucide-react": "^0.577.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^7.13.1",
+    "recharts": "^3.7.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.13.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.3",
+    "eslint": "^9.13.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "eslint-plugin-react-refresh": "^0.4.14",
+    "globals": "^15.11.0",
+    "vite": "^5.4.10"
+  }
+}
+
+```
+
+## File: `backend/requirements.txt`
+```
+fastapi
+uvicorn
+scikit-learn
+pandas
+numpy
+google-generativeai
+python-dotenv
+
+```
+

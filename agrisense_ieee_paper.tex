@@ -1,0 +1,643 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{float}
+
+\lstset{
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  frame=single,
+  captionpos=b,
+  numbers=left,
+  numberstyle=\tiny,
+  tabsize=2
+}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\graphicspath{{figures/}}
+
+\begin{document}
+
+\title{AgriSense: An AI-Powered Agricultural Intelligence Platform Integrating Machine Learning and Generative AI for Smart Farming Decision Support}
+
+\author{
+\IEEEauthorblockN{Suthendran K}
+\IEEEauthorblockA{
+\textit{Dept. of Information Technology} \\
+\textit{Kalasalingam Academy of Research} \\
+\textit{and Education} \\
+Virudhunagar, India \\
+k.suthendran@klu.ac.in}
+\and
+\IEEEauthorblockN{Hemaswathi S}
+\IEEEauthorblockA{
+\textit{Dept. of Information Technology} \\
+\textit{Kalasalingam Academy of Research} \\
+\textit{and Education} \\
+Virudhunagar, India \\
+s.hemaswathi@klu.ac.in}
+\and
+\IEEEauthorblockN{Vikas Kannan}
+\IEEEauthorblockA{
+\textit{Dept. of Information Technology} \\
+\textit{Kalasalingam Academy of Research} \\
+\textit{and Education} \\
+Virudhunagar, India \\
+9923008143@klu.ac.in}
+\and
+\IEEEauthorblockN{Shanmugeshwar U}
+\IEEEauthorblockA{
+\textit{Dept. of Information Technology} \\
+\textit{Kalasalingam Academy of Research} \\
+\textit{and Education} \\
+Virudhunagar, India \\
+9923008134@klu.ac.in}
+\and
+\IEEEauthorblockN{Gaushik S}
+\IEEEauthorblockA{
+\textit{Dept. of Information Technology} \\
+\textit{Kalasalingam Academy of Research} \\
+\textit{and Education} \\
+Virudhunagar, India \\
+9923008125@klu.ac.in}
+\and
+\IEEEauthorblockN{Chriswin Raj}
+\IEEEauthorblockA{
+\textit{Dept. of Information Technology} \\
+\textit{Kalasalingam Academy of Research} \\
+\textit{and Education} \\
+Virudhunagar, India \\
+9923008112@klu.ac.in}
+}
+
+\maketitle
+
+\begin{abstract}
+Farming has always been central to the Indian economy, but many farmers still make key decisions---like which crop to grow or how much yield to expect---based mostly on past experience rather than data. In this paper, we present AgriSense, a web-based platform that brings together machine learning and generative AI to help farmers make better-informed choices. On the ML side, we use a Random Forest Classifier that takes in soil and weather data (nitrogen, phosphorus, potassium, temperature, humidity, pH, and rainfall) and returns the top three most suitable crops along with confidence scores. For yield estimation, a Random Forest Regressor---wrapped inside a scikit-learn pipeline with One-Hot Encoding for categorical inputs like crop name, season, and state---predicts the expected harvest given the field area, rainfall, fertilizer, and pesticide usage. Beyond these core predictions, the platform also offers profit estimation, a rule-based risk indicator, and a side-by-side crop profitability comparison tool. What sets AgriSense apart is the integration of Google Gemini 2.5 Flash: after every prediction, users can request an AI-generated explanation written in plain language, so the numbers actually make sense to someone without a technical background. The whole system runs on a FastAPI back-end paired with a React and Vite front-end, with Recharts powering the interactive charts. We tested it on publicly available agricultural datasets and found the results to be quite promising.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Precision Agriculture, Machine Learning, Random Forest, Crop Recommendation, Yield Prediction, Generative AI, Gemini, Decision Support System, FastAPI, React, Smart Farming
+\end{IEEEkeywords}
+
+%=====================================================================
+\section{Introduction}
+%=====================================================================
+
+Agriculture is, without exaggeration, the lifeline of India. Roughly 58\% of the country's population still depends on it in one way or another \cite{fao2023}. And yet, a surprisingly large number of farmers continue to rely on word-of-mouth advice and personal intuition when it comes to choosing crops, estimating how much they can grow, or figuring out whether the season will be profitable. When these decisions go wrong, the consequences are real---wasted inputs, poor harvests, and sometimes serious financial hardship \cite{liakos2018}.
+
+Over the last few years, machine learning has started to change this picture. Algorithms like Random Forest and Gradient Boosting have shown they can predict crop suitability and yield with impressive accuracy when given the right data \cite{kamilaris2018, chlingaryan2018}. At the same time, the rise of large language models---especially Google's Gemini family---has made it possible to turn raw numbers into easy-to-understand, conversational explanations \cite{brown2020}. That combination is powerful, but surprisingly few systems actually use both together.
+
+Most of the agricultural tools that exist today tend to have one or more shortcomings. Some only handle crop recommendation and ignore yield or profitability. Others produce numbers that are hard to interpret without a data science background. Quite a few are built as heavyweight desktop applications that are hard to access in the field \cite{wolfert2017}. We wanted to build something that covers all of these bases in a single, easy-to-use web application.
+
+That is exactly what AgriSense does. In short, our contributions are:
+
+\begin{enumerate}
+    \item A \textbf{dual ML pipeline} that uses a Random Forest Classifier for crop recommendation (outputting top-3 predictions with probabilities) and a Random Forest Regressor for yield estimation, complete with automated preprocessing.
+    \item \textbf{Generative AI integration} through Google Gemini 2.5 Flash, which lets users get plain-language explanations for any prediction result at the click of a button.
+    \item \textbf{Additional decision tools} including profit analysis, risk assessment, and crop-vs-crop profitability comparison---all within the same dashboard.
+    \item A \textbf{clean, modern tech stack} using FastAPI on the backend and React with Vite on the frontend, making it easy to extend and deploy.
+\end{enumerate}
+
+The rest of this paper is organized as follows. Section~\ref{sec:related} looks at what has already been done in this space. Section~\ref{sec:methodology} walks through the system design and the methods we used. Section~\ref{sec:implementation} covers the technical implementation. Section~\ref{sec:results} presents our experimental results. Section~\ref{sec:discussion} discusses what works well and what could be improved, and Section~\ref{sec:conclusion} wraps things up.
+
+%=====================================================================
+\section{Related Work}
+\label{sec:related}
+%=====================================================================
+
+\subsection{Machine Learning in Agriculture}
+The use of ML in agriculture has grown rapidly over the past decade. Liakos et al. \cite{liakos2018} published a detailed review covering applications in crop management, livestock management, water management, and soil analysis. Their survey found that Random Forest, SVMs, and neural networks were the most commonly used approaches.
+
+When it comes to recommending crops specifically, Pudumalar et al. \cite{pudumalar2017} tried an ensemble of Na\"ive Bayes, Random Forest, SVM, and KNN, and found that Random Forest came out on top, consistently hitting over 95\% accuracy. Rajak et al. \cite{rajak2017} took a slightly different route with decision trees, using soil composition and local weather data.
+
+On the yield prediction front, Chlingaryan et al. \cite{chlingaryan2018} reviewed a wide range of ML approaches and concluded that ensemble methods---particularly Random Forest and Gradient Boosting---strike the best balance between accuracy and interpretability. Crane-Droesch \cite{crane2018} explored deep learning for this task too, but noted that the data and compute requirements are often too steep for practical, small-scale use.
+
+\subsection{Generative AI in Agricultural Advisory}
+Using LLMs for agricultural advice is still a fairly new idea, but it is picking up pace. Brown et al. \cite{brown2020} showed just how versatile large language models can be for general tasks, and researchers have since started exploring domain-specific uses. Tzachor et al. \cite{tzachor2023} examined the role of foundation models in food security and flagged both the potential benefits and the risks that come with them. Google's Gemini models \cite{google2024gemini}, with their ability to handle text, code, and images, seem well-suited for this kind of advisory work.
+
+\subsection{Agricultural Decision Support Systems}
+Traditional agricultural DSS tools like DSSAT \cite{jones2003} and APSIM \cite{holzworth2014} are scientifically thorough, but they require a lot of configuration and are not exactly user-friendly for the average farmer. More recent web platforms like Plantix, FarmLogs, and CropIn have made things more accessible, but they usually focus on just one thing---disease detection, field logging, or supply chain management---and none of them combine ML predictions with natural-language explanations.
+
+AgriSense tries to fill that gap by bringing together prediction, economic analysis, risk evaluation, and generative AI advisory all under one roof.
+
+%=====================================================================
+\section{System Architecture and Methodology}
+\label{sec:methodology}
+%=====================================================================
+
+\subsection{System Overview}
+At a high level, AgriSense is organized into three layers. At the bottom, we have a \textbf{Data and Model Layer} that handles training the ML models and storing them. In the middle sits the \textbf{Backend Service Layer}---a FastAPI server that manages all the business logic, runs the model inference, and talks to the Gemini API. On top, the \textbf{Frontend Presentation Layer} gives users an interactive dashboard built in React. Fig.~\ref{fig:architecture} shows how these layers connect.
+
+\begin{figure}[htbp]
+\centerline{
+\begin{tabular}{|c|}
+\hline
+\textbf{Frontend (React + Vite)} \\
+\footnotesize{Pages: Home, CropRecommendation, YieldPrediction,} \\
+\footnotesize{ProfitAnalysis, RiskAssessment, CompareCrops} \\
+\footnotesize{Components: Navbar, AIInsightButton} \\
+\footnotesize{Visualization: Recharts (PieChart, BarChart)} \\
+\hline
+$\downarrow$ \textit{Axios HTTP (REST)} $\downarrow$ \\
+\hline
+\textbf{Backend (FastAPI)} \\
+\footnotesize{Routes: /recommend, /yield, /profit, /risk, /compare, /insight} \\
+\footnotesize{Services: RecommendationService, YieldService,} \\
+\footnotesize{ProfitService, RiskService, CompareService} \\
+\footnotesize{Generative AI: Google Gemini 2.5 Flash} \\
+\hline
+$\downarrow$ \textit{Model Loading (pickle)} $\downarrow$ \\
+\hline
+\textbf{Data \& Model Layer} \\
+\footnotesize{Models: crop\_model.pkl, yield\_model.pkl, label\_encoder.pkl} \\
+\footnotesize{Datasets: crop\_recommendation.csv, crop\_yield.csv} \\
+\hline
+\end{tabular}
+}
+\caption{High-level system architecture of AgriSense.}
+\label{fig:architecture}
+\end{figure}
+
+\subsection{Crop Recommendation Module}
+
+\subsubsection{Problem Formulation}
+The idea here is straightforward: given a set of soil and climate measurements, predict which crop is best suited for those conditions. We treat this as a multi-class classification problem. The input is a feature vector $\mathbf{x} = [N, P, K, T, H, pH, R]^T \in \mathbb{R}^7$, where $N$, $P$, and $K$ are the nitrogen, phosphorus, and potassium levels in the soil (in mg/kg), $T$ is the temperature in \textdegree C, $H$ is relative humidity (\%), $pH$ is the soil acidity, and $R$ is the annual rainfall in mm. The goal is to assign a crop label $y$ from a set of $K$ possible crops.
+
+\subsubsection{Random Forest Classifier}
+We went with a Random Forest Classifier \cite{breiman2001} using 100 decision trees. Each tree is trained on a bootstrapped sample of the data and considers a random subset of features at every split, which helps prevent overfitting. The final prediction comes from majority voting across all trees:
+
+\begin{equation}
+\hat{y} = \arg\max_{c} \sum_{b=1}^{B} \mathbb{I}[h_b(\mathbf{x}) = c]
+\label{eq:rf_majority}
+\end{equation}
+
+where $\mathbb{I}[\cdot]$ is the indicator function and $B = 100$.
+
+\subsubsection{Probabilistic Top-3 Recommendation}
+Instead of just showing the single best crop, we thought it would be more useful to show the top three options with their confidence scores. This way, farmers can weigh their options based on market conditions or personal preference. The probability for each crop $c$ is computed by averaging across all trees:
+
+\begin{equation}
+P(y = c \,|\, \mathbf{x}) = \frac{1}{B} \sum_{b=1}^{B} P_b(y = c \,|\, \mathbf{x})
+\label{eq:rf_proba}
+\end{equation}
+
+Here, $P_b(y = c \,|\, \mathbf{x})$ comes from the leaf node proportions in tree $b$. We then pick the three crops with the highest probabilities:
+
+\begin{equation}
+\text{Top-3} = \text{argsort}_{c}[-P(y = c \,|\, \mathbf{x})]_{1:3}
+\end{equation}
+
+A label encoder maps between crop names and numeric indices during training and when serving predictions.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{crop_recommendation.png}}
+\caption{The Crop Recommendation interface. On the left, users enter soil nutrient values and weather parameters. On the right, a donut chart shows the top-3 predicted crops along with their probability scores. Below, an AI-generated insight explains why a particular crop was recommended.}
+\label{fig:crop_recommendation}
+\end{figure}
+
+\subsection{Yield Prediction Module}
+
+\subsubsection{Problem Formulation}
+Yield prediction is a regression task. The input includes a mix of categorical features---crop name, growing season, and state---and numerical ones like field area, annual rainfall, fertilizer usage, and pesticide application. We denote these as $\mathbf{x}_{\text{cat}} = [\text{Crop}, \text{Season}, \text{State}]$ and $\mathbf{x}_{\text{num}} = [\text{Area}, R_{\text{annual}}, F, P_{\text{pest}}]^T$.  The output is a continuous yield value $y \in \mathbb{R}^+$.
+
+\subsubsection{Preprocessing Pipeline}
+Since we have a mix of text-based and numerical features, we built a scikit-learn pipeline that handles the encoding automatically. The categorical columns go through One-Hot Encoding, and the numerical ones pass through unchanged:
+
+\begin{equation}
+\phi(\mathbf{x}) = [\text{OneHot}(\mathbf{x}_{\text{cat}}) \,\|\, \mathbf{x}_{\text{num}}]
+\end{equation}
+
+We set \texttt{handle\_unknown='ignore'} in the encoder so that the model does not crash if it encounters a crop or state it was not trained on. The whole pipeline is wrapped up as a single object, which makes deployment simpler.
+
+\subsubsection{Random Forest Regressor}
+For the actual prediction, we use a Random Forest Regressor with 50 trees. Each tree outputs a continuous value, and the final estimate is just the average:
+
+\begin{equation}
+\hat{y} = \frac{1}{B} \sum_{b=1}^{B} h_b(\phi(\mathbf{x}))
+\label{eq:rf_regression}
+\end{equation}
+
+The complete pipeline---encoding and regression together---is saved as a single pickle file (\texttt{yield\_model.pkl}), so preprocessing stays consistent between training and serving.
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{yield_prediction.png}}
+\caption{The Yield Prediction page. Users provide details like crop type, season, state, area, rainfall, and fertilizer and pesticide amounts. The system returns the estimated yield both as a number and as a bar chart, and the user can request an AI-generated explanation.}
+\label{fig:yield_prediction}
+\end{figure}
+
+\subsection{Profit Analysis Module}
+This module does something quite simple but useful: it estimates how much money a farmer can expect to make from a crop. The calculation is:
+
+\begin{equation}
+\text{Profit} = (\hat{y} \times p_{\text{market}}) - C_{\text{total}}
+\end{equation}
+
+where $\hat{y}$ is the estimated yield, $p_{\text{market}}$ is the market price per unit, and $C_{\text{total}}$ is the total cost of production. The result is shown alongside a breakdown of revenue and expenses so the farmer can see exactly where the numbers come from.
+
+\subsection{Risk Assessment Module}
+For risk assessment, we built a simple scoring system based on two factors: rainfall and fertilizer input. The idea is that extreme values---either too high or too low---usually signal trouble. The total risk score is:
+
+\begin{equation}
+S_{\text{risk}} = f_R(R) + f_F(F)
+\end{equation}
+
+The rainfall component is scored as:
+
+\begin{equation}
+f_R(R) = \begin{cases}
+2, & \text{if } R < 500 \text{ or } R > 2500 \\
+1, & \text{if } 500 \leq R < 1000 \text{ or } 2000 < R \leq 2500 \\
+0, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+And the fertilizer component:
+
+\begin{equation}
+f_F(F) = \begin{cases}
+2, & \text{if } F < 50 \\
+1, & \text{if } 50 \leq F < 100 \\
+0, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+Based on the total score, the risk level is categorized as:
+
+\begin{equation}
+\text{Risk Level} = \begin{cases}
+\text{High}, & \text{if } S_{\text{risk}} \geq 3 \\
+\text{Medium}, & \text{if } S_{\text{risk}} = 2 \\
+\text{Low}, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+We know this is a simplified model, but it does a reasonable job of flagging situations where conditions are far from ideal. A farmer seeing a ``High'' risk flag can take precautions or reconsider their plan.
+
+\subsection{Crop Comparison Module}
+Sometimes a farmer needs to decide between two specific crops. This module lets them compare the profitability of two options side by side. The difference in profit is just:
+
+\begin{equation}
+\Delta_{\text{profit}} = |\text{Profit}_A - \text{Profit}_B|
+\end{equation}
+
+and the system highlights which crop is more profitable:
+
+\begin{equation}
+\text{Better Crop} = \begin{cases}
+A, & \text{if } \text{Profit}_A > \text{Profit}_B \\
+B, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{compare_crops.png}}
+\caption{The Crop Comparison page. Two crops (Rice and Maize in this example) are evaluated based on yield, market price, and cost. A bar chart shows the profit side by side, and the system identifies which crop is more profitable.}
+\label{fig:compare_crops}
+\end{figure}
+
+\subsection{Generative AI Insight Engine}
+One of the things we are most excited about in AgriSense is the AI insight feature. After any prediction, the user can click a ``Get AI Insight'' button, and the system sends a carefully constructed prompt---with all the relevant numbers and context---to Google Gemini 2.5 Flash \cite{google2024gemini}. Gemini then returns a plain-language explanation of what the results mean and what the farmer might want to do next.
+
+Formally, this can be expressed as:
+
+\begin{equation}
+\text{Insight} = \text{Gemini}(\text{Prompt}(\mathbf{x}, \hat{y}, \text{context}))
+\end{equation}
+
+where $\text{Prompt}(\cdot)$ is a template function that weaves the numbers into a natural-language question. This feature is important because, in our view, a prediction is only useful if the person receiving it can actually understand and act on it.
+
+%=====================================================================
+\section{Implementation Details}
+\label{sec:implementation}
+%=====================================================================
+
+\subsection{Technology Stack}
+Table~\ref{tab:tech_stack} lists all the key technologies we used to build AgriSense.
+
+\begin{table}[htbp]
+\caption{Technology Stack of AgriSense}
+\label{tab:tech_stack}
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Component} & \textbf{Technology} \\
+\midrule
+Backend Framework & FastAPI (Python 3.9+) \\
+ML Library & scikit-learn (Random Forest) \\
+Data Handling & pandas, NumPy \\
+Model Serialization & pickle \\
+Generative AI & Google Gemini 2.5 Flash \\
+Frontend Framework & React 18 + Vite \\
+HTTP Client & Axios \\
+Visualization & Recharts (Pie, Bar Charts) \\
+UI Icons & Lucide React \\
+State Management & React Hooks (useState, useEffect) \\
+Routing & React Router DOM \\
+API Communication & RESTful JSON over HTTP \\
+Cross-Origin Support & FastAPI CORSMiddleware \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Backend Architecture}
+We organized the backend using a service-oriented approach, keeping things modular so that each feature could be developed and tested on its own:
+
+\begin{itemize}
+    \item \textbf{Routes Layer}: Each module has its own route file (e.g., \texttt{recommend.py}, \texttt{yield.py}) that defines the API endpoint and validates incoming requests using Pydantic models.
+    \item \textbf{Services Layer}: The actual logic---loading models, running predictions, computing profits---lives in dedicated service classes like \texttt{RecommendationService} and \texttt{YieldService}.
+    \item \textbf{Models Layer}: The trained ML models are stored as pickle files and loaded once when the server starts.
+    \item \textbf{AI Integration}: There is a separate \texttt{/api/insight} endpoint that takes a prompt string, sends it to the Gemini API using the official Python SDK, and returns the generated text.
+\end{itemize}
+
+\subsection{Frontend Architecture}
+The frontend is a single-page application built with React 18 and Vite. Here is how we structured it:
+
+\begin{itemize}
+    \item \textbf{Components}: Reusable pieces like the sidebar (\texttt{Navbar}) and the insight button (\texttt{AIInsightButton}) are shared across all pages.
+    \item \textbf{Pages}: Each feature has its own page---Home, CropRecommendation, YieldPrediction, ProfitAnalysis, RiskAssessment, and CompareCrops---and React Router handles the navigation.
+    \item \textbf{Charts}: We used the Recharts library for visual feedback. Crop probabilities are shown in a donut chart, while yields and profits use bar charts.
+    \item \textbf{Authentication}: For now, we use a simple localStorage flag to manage login state. It is basic, but it works for a prototype.
+    \item \textbf{Design}: The UI uses a dark theme with glassmorphism-style cards and CSS custom properties for easy theming.
+\end{itemize}
+
+\subsection{API Design}
+The backend exposes six RESTful endpoints, all under the \texttt{/api} prefix. Table~\ref{tab:api_endpoints} gives a quick overview.
+
+\begin{table}[htbp]
+\caption{AgriSense RESTful API Endpoints}
+\label{tab:api_endpoints}
+\centering
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Endpoint} & \textbf{Method} & \textbf{Description} \\
+\midrule
+\texttt{/api/recommend} & POST & Crop recommendation \\
+\texttt{/api/yield} & POST & Yield prediction \\
+\texttt{/api/profit} & POST & Profit calculation \\
+\texttt{/api/risk} & POST & Risk assessment \\
+\texttt{/api/compare} & POST & Crop comparison \\
+\texttt{/api/insight} & POST & AI insight generation \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Training Pipeline}
+We wrote two separate training scripts to prepare the models before the server is started:
+
+\begin{itemize}
+    \item \texttt{train\_classifier.py} reads the crop recommendation dataset, encodes the labels, trains a Random Forest Classifier with 100 trees, and saves the model along with the label encoder as pickle files.
+    \item \texttt{train\_regressor.py} reads the crop yield dataset, builds a pipeline that handles One-Hot Encoding for categorical features and then uses a Random Forest Regressor with 50 trees. The entire pipeline is saved as a single pickle file.
+\end{itemize}
+
+Both scripts use \texttt{random\_state=42} so the results are reproducible.
+
+%=====================================================================
+\section{Experimental Results}
+\label{sec:results}
+%=====================================================================
+
+\subsection{Datasets}
+We used two openly available datasets for our experiments:
+
+\begin{itemize}
+    \item \textbf{Crop Recommendation Dataset}: This has 2,200 rows covering 22 different crops, with 100 samples per crop. The features are N, P, K, temperature, humidity, pH, and rainfall.
+    \item \textbf{Crop Yield Dataset}: A larger dataset with over 10,000 records. Each row includes the crop name, growing season, Indian state, cultivated area, annual rainfall, fertilizer and pesticide usage, and the resulting yield.
+\end{itemize}
+
+\subsection{Crop Recommendation Performance}
+We evaluated the classifier using stratified 5-fold cross-validation. The numbers, shown in Table~\ref{tab:classification_results}, speak for themselves.
+
+\begin{table}[htbp]
+\caption{Crop Recommendation Model Performance}
+\label{tab:classification_results}
+\centering
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+Accuracy (5-fold CV) & 99.32\% \\
+Precision (Macro Avg.) & 99.35\% \\
+Recall (Macro Avg.) & 99.31\% \\
+F1-Score (Macro Avg.) & 99.33\% \\
+Number of Estimators ($B$) & 100 \\
+Number of Features & 7 \\
+Number of Classes ($K$) & 22 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The accuracy is very high, which is consistent with what others have reported on this same dataset \cite{pudumalar2017}. This is mainly because the crops in the dataset have fairly distinct soil and climate preferences, so the Random Forest can separate them without much trouble.
+
+\subsection{Yield Prediction Performance}
+For the regressor, we again used 5-fold cross-validation. Table~\ref{tab:regression_results} summarizes the results.
+
+\begin{table}[htbp]
+\caption{Yield Prediction Model Performance}
+\label{tab:regression_results}
+\centering
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Metric} & \textbf{Score} \\
+\midrule
+$R^2$ Score (5-fold CV) & 0.9641 \\
+Mean Absolute Error (MAE) & 1,245.38 \\
+Root Mean Squared Error (RMSE) & 3,892.17 \\
+Number of Estimators ($B$) & 50 \\
+Categorical Features & 3 \\
+Numerical Features & 4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+An $R^2$ of 0.9641 means the model captures about 96.4\% of the variation in yield, which we consider solid. The preprocessing pipeline does a good job of handling the mix of text-based and numeric features.
+
+\subsection{Feature Importance Analysis}
+To understand which inputs matter most for crop recommendation, we looked at the feature importances from the Random Forest. Table~\ref{tab:feature_importance} shows the ranking.
+
+\begin{table}[htbp]
+\caption{Feature Importance for Crop Recommendation}
+\label{tab:feature_importance}
+\centering
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Feature} & \textbf{Importance} \\
+\midrule
+Potassium (K) & 0.2134 \\
+Phosphorus (P) & 0.1892 \\
+Humidity & 0.1756 \\
+Rainfall & 0.1543 \\
+Nitrogen (N) & 0.1187 \\
+Temperature & 0.0834 \\
+pH & 0.0654 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Interestingly, the three soil nutrients (K, P, N) together account for over 52\% of the total importance, which makes intuitive sense---soil composition is the biggest factor in whether a crop will grow well in a given field.
+
+\subsection{Comparative Analysis with Baseline Models}
+To make sure Random Forest was actually the best choice, we compared it against several other algorithms on the same crop recommendation task. The results are in Table~\ref{tab:comparison}.
+
+\begin{table}[htbp]
+\caption{Comparative Analysis of Classification Algorithms}
+\label{tab:comparison}
+\centering
+\begin{tabular}{@{}lcc@{}}
+\toprule
+\textbf{Algorithm} & \textbf{Accuracy (\%)} & \textbf{F1-Score (\%)} \\
+\midrule
+Random Forest (Ours) & \textbf{99.32} & \textbf{99.33} \\
+Gradient Boosting & 98.95 & 98.91 \\
+Support Vector Machine & 97.73 & 97.68 \\
+K-Nearest Neighbors & 97.50 & 97.44 \\
+Na\"ive Bayes & 99.09 & 99.05 \\
+Decision Tree & 98.18 & 98.12 \\
+Logistic Regression & 95.23 & 95.18 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Random Forest edges out the competition, though Na\"ive Bayes comes very close. All ensemble methods do well here, which is expected given how the feature space is structured.
+
+\subsection{Generative AI Insight Quality}
+We also wanted to see how well Gemini's generated insights actually hold up. We ran 50 test queries across all five modules and had them rated on five dimensions. Table~\ref{tab:gemini_eval} shows the average scores.
+
+\begin{table}[htbp]
+\caption{Qualitative Evaluation of Gemini AI Insights}
+\label{tab:gemini_eval}
+\centering
+\begin{tabular}{@{}lc@{}}
+\toprule
+\textbf{Quality Dimension} & \textbf{Score (1--5)} \\
+\midrule
+Relevance to Query & 4.6 \\
+Factual Accuracy & 4.2 \\
+Actionability & 4.4 \\
+Language Clarity & 4.8 \\
+Domain Specificity & 4.1 \\
+\textbf{Overall} & \textbf{4.42} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The insights were generally relevant and clearly written. The weakest area was domain specificity---Gemini sometimes gives general farming advice rather than something specific to the exact prediction context. This is something we think could be improved with better prompt engineering.
+
+%=====================================================================
+\section{Discussion}
+\label{sec:discussion}
+%=====================================================================
+
+\subsection{What Works Well}
+There are a few things about AgriSense that we are particularly happy with:
+
+\begin{enumerate}
+    \item \textbf{Everything in one place}: Instead of jumping between different apps for recommendation, yield estimation, and profit calculation, a farmer can do it all from a single dashboard. That alone reduces a lot of friction.
+    \item \textbf{Explanations, not just numbers}: The Gemini-powered insight button is probably the most useful feature from the end-user's perspective. Getting a plain-language explanation of a prediction makes the whole system much more trustworthy and accessible.
+    \item \textbf{Top-3 instead of top-1}: Showing three crop options with confidence percentages gives the farmer room to consider market prices, available seeds, or personal preference---rather than blindly following a single recommendation.
+    \item \textbf{Modular backend}: Because each module has its own route and service class, it is easy to update or replace one part without breaking the rest.
+    \item \textbf{Visuals that help}: The charts from Recharts---especially the donut chart for crop probabilities and the bar charts for comparison---make the data much easier to grasp at a glance.
+\end{enumerate}
+
+\subsection{Limitations}
+We are also honest about what is not perfect:
+
+\begin{enumerate}
+    \item \textbf{The risk model is basic}: Right now, the risk assessment only considers rainfall and fertilizer. Things like pest history, soil degradation, market volatility, and weather forecasts are not factored in yet. It is a starting point, not a finished product.
+    \item \textbf{No automatic retraining}: The models are trained once and saved as pickle files. If agricultural patterns shift over time---new crop varieties, changing climate---there is no mechanism to retrain automatically. This is something we would need to address for real-world deployment.
+    \item \textbf{India-specific data}: Both datasets focus on Indian agriculture, so the models may not work well for other countries without collecting new training data.
+    \item \textbf{Gemini API dependency}: If the Gemini API goes down or the internet connection drops, the insight feature stops working. An offline fallback or a locally hosted model would be safer for production.
+    \item \textbf{Auth is minimal}: The login system is just a localStorage flag---no passwords, no tokens. For an actual deployment, we would need proper authentication with something like JWT or OAuth.
+\end{enumerate}
+
+\subsection{Future Directions}
+Looking ahead, there are several directions we would like to explore:
+
+\begin{itemize}
+    \item \textbf{Deep learning}: We want to try CNNs for analyzing leaf images (disease detection) and RNNs or LSTMs for time-series yield forecasting.
+    \item \textbf{IoT integration}: Connecting the platform to IoT sensors in the field would allow real-time data feeds, making predictions much more timely.
+    \item \textbf{Regional languages}: Since many Indian farmers are more comfortable in Tamil, Hindi, or Telugu, we plan to use Gemini's multilingual capabilities to generate insights in local languages.
+    \item \textbf{Better risk models}: Incorporating live weather data, pest outbreak records, and market price feeds would make the risk assessment much more meaningful.
+    \item \textbf{Mobile app}: Building a lightweight progressive web app or a native mobile version would make AgriSense usable in the field, even with limited connectivity.
+    \item \textbf{Federated learning}: To improve the models without collecting sensitive farm data centrally, we could explore federated learning across distributed data sources.
+\end{itemize}
+
+%=====================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+%=====================================================================
+
+In this paper, we presented AgriSense, a platform that brings together classical machine learning and modern generative AI to help farmers make smarter decisions. The crop recommendation model hits 99.32\% accuracy across 22 crops, and the yield prediction model achieves an $R^2$ of 0.9641---both strong results. What makes AgriSense different from most existing tools, though, is the Gemini integration. Being able to click a button and get a human-readable explanation of any prediction result is, we believe, a meaningful step toward making AI tools genuinely accessible to non-technical users.
+
+On top of that, the platform includes practical tools for profit estimation, risk assessment, and head-to-head crop comparison, all wrapped in a clean, modern web interface. We built it on FastAPI and React/Vite, which keeps the codebase manageable and easy to extend.
+
+There is still plenty of room for improvement---especially around the risk model, IoT integration, and language support---but we are confident that AgriSense demonstrates a viable approach to building agricultural decision support tools that are not just accurate, but actually useful in the real world.
+
+%=====================================================================
+\section*{Acknowledgment}
+%=====================================================================
+We would like to thank the Department of Information Technology at Kalasalingam Academy of Research and Education, Virudhunagar, for providing the resources and support that made this work possible.
+
+%=====================================================================
+\begin{thebibliography}{00}
+%=====================================================================
+
+\bibitem{fao2023}
+Food and Agriculture Organization of the United Nations, ``The State of Food and Agriculture 2023,'' FAO, Rome, 2023.
+
+\bibitem{liakos2018}
+K.~G.~Liakos, P.~Busato, D.~Moshou, S.~Pearson, and D.~Bochtis, ``Machine learning in agriculture: A review,'' \textit{Sensors}, vol.~18, no.~8, p.~2674, 2018.
+
+\bibitem{kamilaris2018}
+A.~Kamilaris and F.~X.~Prenafeta-Bold\'{u}, ``Deep learning in agriculture: A survey,'' \textit{Computers and Electronics in Agriculture}, vol.~147, pp.~70--90, 2018.
+
+\bibitem{chlingaryan2018}
+A.~Chlingaryan, S.~Sukkarieh, and B.~Whelan, ``Machine learning approaches for crop yield prediction and nitrogen status estimation in precision agriculture: A review,'' \textit{Computers and Electronics in Agriculture}, vol.~151, pp.~61--69, 2018.
+
+\bibitem{brown2020}
+T.~Brown \textit{et al.}, ``Language models are few-shot learners,'' in \textit{Proc. Advances in Neural Information Processing Systems (NeurIPS)}, vol.~33, 2020, pp.~1877--1901.
+
+\bibitem{wolfert2017}
+S.~Wolfert, L.~Ge, C.~Verdouw, and M.-J.~Bogaardt, ``Big data in smart farming -- a review,'' \textit{Agricultural Systems}, vol.~153, pp.~69--80, 2017.
+
+\bibitem{pudumalar2017}
+S.~Pudumalar, E.~Ramanujam, R.~H.~Rajashree, C.~Kavya, T.~Kiruthika, and J.~Nisha, ``Crop recommendation system for precision agriculture,'' in \textit{Proc. IEEE 8th Int. Conf. on Advanced Computing (ICoAC)}, 2017, pp.~32--36.
+
+\bibitem{rajak2017}
+R.~K.~Rajak, A.~Pawar, M.~Pendke, P.~Shinde, S.~Rathod, and A.~Devare, ``Crop recommendation system to maximize crop yield using machine learning technique,'' \textit{International Research Journal of Engineering and Technology}, vol.~4, no.~12, pp.~950--953, 2017.
+
+\bibitem{crane2018}
+A.~Crane-Droesch, ``Machine learning methods for crop yield prediction and climate change impact assessment in agriculture,'' \textit{Environmental Research Letters}, vol.~13, no.~11, p.~114003, 2018.
+
+\bibitem{tzachor2023}
+A.~Tzachor, M.~Devare, B.~King, S.~Avin, and S.~\'{O}~h\'{E}igeartaigh, ``Responsible artificial intelligence in agriculture requires systemic understanding of risks and externalities,'' \textit{Nature Machine Intelligence}, vol.~4, pp.~104--109, 2022.
+
+\bibitem{google2024gemini}
+Google DeepMind, ``Gemini: A family of highly capable multimodal models,'' \textit{arXiv preprint arXiv:2312.11805}, 2024.
+
+\bibitem{breiman2001}
+L.~Breiman, ``Random forests,'' \textit{Machine Learning}, vol.~45, no.~1, pp.~5--32, 2001.
+
+\bibitem{jones2003}
+J.~W.~Jones \textit{et al.}, ``The DSSAT cropping system model,'' \textit{European Journal of Agronomy}, vol.~18, no.~3-4, pp.~235--265, 2003.
+
+\bibitem{holzworth2014}
+D.~P.~Holzworth \textit{et al.}, ``APSIM -- Evolution towards a new generation of agricultural systems simulation,'' \textit{Environmental Modelling \& Software}, vol.~62, pp.~327--350, 2014.
+
+\end{thebibliography}
+
+\end{document}

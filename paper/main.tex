@@ -1,0 +1,65 @@
+% ============================================================
+% AgriSense IEEE Research Paper - Main Driver File
+% ============================================================
+% This is the main compilation file. Run: pdflatex main.tex
+% Each section is in a separate file under sections/ for
+% easy version control and collaborative editing.
+% ============================================================
+
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+% ---- Packages ----
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{listings}
+\usepackage{float}
+
+\lstset{
+  basicstyle=\footnotesize\ttfamily,
+  breaklines=true,
+  frame=single,
+  captionpos=b,
+  numbers=left,
+  numberstyle=\tiny,
+  tabsize=2
+}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+% ---- Title ----
+\input{sections/title}
+
+\maketitle
+
+% ---- Abstract & Keywords ----
+\input{sections/abstract}
+
+% ---- Main Sections ----
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/methodology}
+\input{sections/implementation}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/conclusion}
+
+% ---- Acknowledgment ----
+\input{sections/acknowledgment}
+
+% ---- References ----
+\input{sections/references}
+
+\end{document}

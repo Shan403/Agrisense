@@ -1,0 +1,11 @@
+% ============================================================
+% Abstract and Keywords
+% ============================================================
+
+\begin{abstract}
+Agriculture remains the backbone of the global economy, yet farmers, particularly in developing nations like India, continue to face critical challenges in making data-driven decisions regarding crop selection, yield estimation, and financial planning. This paper presents \textbf{AgriSense}, a comprehensive AI-powered agricultural intelligence platform that integrates ensemble machine learning models with Google's Gemini generative AI to deliver real-time, actionable decision support for farmers. AgriSense employs a Random Forest Classifier trained on multi-dimensional soil and climatic parameters---Nitrogen (N), Phosphorus (P), Potassium (K), temperature, humidity, pH, and rainfall---to recommend optimal crops with probabilistic confidence scores. A Random Forest Regressor, combined with a preprocessing pipeline incorporating One-Hot Encoding for categorical variables (crop type, season, and state), predicts crop yield based on field-level data including area, annual rainfall, fertilizer, and pesticide inputs. The platform further incorporates profit analysis, heuristic-based agricultural risk assessment, and comparative crop profitability evaluation modules. A distinctive feature is the integration of Google Gemini 2.5 Flash for generating contextual, natural-language AI insights from prediction results, thereby bridging the gap between raw model outputs and farmer-comprehensible advisories. Built on a modern full-stack architecture---FastAPI backend with RESTful APIs and a React/Vite frontend with interactive Recharts visualizations---AgriSense demonstrates how the convergence of classical machine learning, generative AI, and contemporary web technologies can be harnessed to create an accessible, scalable, and practical precision agriculture tool. Experimental evaluations on publicly available agricultural datasets validate the efficacy of the proposed system.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Precision Agriculture, Machine Learning, Random Forest, Crop Recommendation, Yield Prediction, Generative AI, Gemini, Decision Support System, FastAPI, React, Smart Farming
+\end{IEEEkeywords}

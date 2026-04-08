@@ -1,0 +1,127 @@
+DESIGN AND FABRICATION OF CURRENT CONTROLLED SHUNT ACTIVE POWER FILTER FOR HARMONIC REDUCTION
+<Font Size 18><bold><1.5 line spacing>
+A DESIGN, BUILD REPORT
+<Font Size 14><bold>
+Submitted by
+<Font Size 14><Italic>
+RAVICHANDRAN C
+(Reg. No. 2 01307201)
+<Font Size 16><bold>
+in partial fulfillment for the award of the degree
+of
+<Font Size 14><Italic><1.5 line spacing>
+BACHELOR OF TECHNOLOGY
+<Font Size 16>
+DEPARTMENT OF ELECTRICAL AND ELECTRONICS ENGINEERING
+SCHOOL OF ELECTRONICS AND ELECTRICAL TECHNOLOGY
+<Font Size 13><bold>
+KALASALINGAM ACADEMY OF RESEARCH AND EDUCATION
+<Font Size 14><1.5 line spacing><bold>
+(DEEMED TO BE UNIVERSITY)<Font Size 12>
+ANAND NAGAR, KRISHNANKOIL – 626 126
+TAMIL NADU, INDIA
+<Font Size 14><1.5 line spacing><bold>
+JANUARY 2022
+<Font Size 13><bold>
+DESIGN AND FABRICATION OF CURRENT CONTROLLED SHUNT ACTIVE POWER FILTER FOR HARMONIC REDUCTION
+A DESIGN, BUILD REPORT
+215EXS2201
+Submitted by
+RAVICHANDRAN C
+(Reg. No. 201307201)
+in partial fulfillment for the award of the degree
+of
+BACHELOR OF TECHNOLOGY
+DEPARTMENT OF ELECTRICAL AND ELECTRONICS ENGINEERING
+SCHOOL OF ELECTRONICS AND ELECTRICAL TECHNOLOGY
+KALASALINGAM ACADEMY OF RESEARCH AND EDUCATION
+(DEEMED TO BE UNIVERSITY)
+ANAND NAGAR, KRISHNANKOIL – 626 126
+TAMIL NADU, INDIA
+JANUARY 2022
+KALASALINGAM ACADEMY OF RESEARCH AND EDUCATION
+(Deemed to be University)
+ANAND NAGAR, KRISHNANKOIL 626 126
+<Font Size 15><bold>
+DECLARATION
+<Font Size 14><bold>
+<Font Size 13>
+I  do hereby declare that this Project work entitled “______________________________” submitted by us is the result of our original and independent research work carried  out during July 2025 – November 2025 for the course - 215EXS2201 – Exsel Water Vertical theme on Pipe Descaling under the guidance of  ___________________________________________________ Kalasalingam University, Anand Nagar, Krishnankoil and it  has not been submitted  for the award of any Degree, Diploma, Associateship, Fellowship of any University or Institution.
+Team Details
+Date:
+Dr Naresh Kumar Sharma
+Associate Professor, Centre for Water Technology
+Department of Biotechnology
+Kalasalingam Academy of Research and Education, TN 626126 INDIA
+ABSTRACT
+ACKNOWLEDGEMENT
+TABLE OF CONTENTS
+ANNEXURE VI
+LIST OF SYMBOLS AND ABBREVIATIONS
+SYMBOLS
+Course: 215EXS2201 – Exsel Water Vertical: Pipe Descaling
+Academic Year: 2025–26  Semester: V  Department: ___________________
+1. Abstract (150–200 words)
+Provide a concise summary highlighting the problem addressed, the proposed descaling concept, key methods, and the major findings or outcomes.
+2. Introduction (Problem Context and Need Identification)
+Background of the problem (hard water scaling and its impact).
+Industry relevance and motivation for developing a solution.
+Objectives of the project.
+Scope and limitations.
+3. Literature Review and Gap Identification
+Summary of existing descaling systems (chemical, mechanical, electromagnetic, etc.).
+Critical analysis of current solutions (performance, cost, sustainability).
+Identification of gaps or challenges your project aims to address.
+4. Problem Definition and Design Objectives
+Problem statement (precise and measurable).
+Design criteria (efficiency, safety, cost, environmental sustainability).
+Functional and performance goals of your system.
+5. Concept Generation and Selection
+Brainstormed ideas and conceptual sketches.
+Comparison matrix of alternative design options (based on feasibility, cost, and sustainability).
+Final design concept selection and justification.
+6. System Design and Engineering Details
+(Include detailed design drawings, block diagrams, and calculations)
+6.1 Design Overview
+Provide schematic / CAD drawing of your descaling prototype.
+6.2 Working Principle
+Explain how your design reduces or prevents scale formation (mechanical, EM, turbulence-induced, etc.).
+6.3 Materials and Components Used
+6.4 Design Calculations (if applicable)
+Electrical: coil current, EMF, frequency range.
+Mechanical: flow rate, velocity, turbulence number.
+Thermal or pressure considerations.
+7. Prototype Fabrication and Assembly
+Step-by-step fabrication procedure.
+Images of prototype at various stages.
+Safety and compliance considerations.
+8. Performance Testing and Evaluation
+Parameters measured: scale reduction %, flow rate, energy usage, etc.
+Test setup description with labeled photographs.
+Results table and performance graphs.
+8.1 Data Analysis and Comparison
+Compare your results with benchmark systems or theoretical expectations.
+9. Cost Analysis and Sustainability Assessment
+Total cost and cost per litre of water treated (if applicable).
+Environmental benefits (chemical-free, energy-efficient, recyclable materials).
+Life-cycle sustainability evaluation.
+10. Discussion and Design Optimization
+Discussion of performance outcomes.
+Identified limitations.
+Suggested improvements for future prototypes.
+11. Learning Outcomes and Team Reflection
+Each team member should briefly describe:
+Key technical and non-technical skills learned.
+Design thinking and problem-solving experience.
+Collaboration and communication takeaways.
+12. Conclusion and Future Scope
+Summarize key findings, contributions to sustainable descaling technology, and possible directions for commercialization or campus-scale implementation.
+13. References
+List all sources cited in IEEE / APA format.
+14. Appendices (if any)
+Raw data, circuit diagrams, code snippets, or CAD drawings.
+Additional test results, charts, or images.
+Faculty Evaluation (For Official Use)
+Rubrics for Final Project Presentation:
+Team Member Score
+Evaluator’s Signature: ____________________  Date: ____________________

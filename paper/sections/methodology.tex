@@ -1,0 +1,165 @@
+% ============================================================
+% Section III: System Architecture and Methodology
+% ============================================================
+
+\section{System Architecture and Methodology}
+\label{sec:methodology}
+
+\subsection{System Overview}
+AgriSense follows a three-tier architectural paradigm comprising: (i) a \textbf{Data and Model Layer} responsible for training, serializing, and loading ML models; (ii) a \textbf{Backend Service Layer} implemented as a REST API server that encapsulates business logic, ML inference, and generative AI interactions; and (iii) a \textbf{Frontend Presentation Layer} that provides an interactive, visually rich dashboard interface. Fig.~\ref{fig:architecture} illustrates the high-level system architecture.
+
+\begin{figure}[htbp]
+\centerline{
+\begin{tabular}{|c|}
+\hline
+\textbf{Frontend (React + Vite)} \\
+\footnotesize{Pages: Home, CropRecommendation, YieldPrediction,} \\
+\footnotesize{ProfitAnalysis, RiskAssessment, CompareCrops} \\
+\footnotesize{Components: Navbar, AIInsightButton} \\
+\footnotesize{Visualization: Recharts (PieChart, BarChart)} \\
+\hline
+$\downarrow$ \textit{Axios HTTP (REST)} $\downarrow$ \\
+\hline
+\textbf{Backend (FastAPI)} \\
+\footnotesize{Routes: /recommend, /yield, /profit, /risk, /compare, /insight} \\
+\footnotesize{Services: RecommendationService, YieldService,} \\
+\footnotesize{ProfitService, RiskService, CompareService} \\
+\footnotesize{Generative AI: Google Gemini 2.5 Flash} \\
+\hline
+$\downarrow$ \textit{Model Loading (pickle)} $\downarrow$ \\
+\hline
+\textbf{Data \& Model Layer} \\
+\footnotesize{Models: crop\_model.pkl, yield\_model.pkl, label\_encoder.pkl} \\
+\footnotesize{Datasets: crop\_recommendation.csv, crop\_yield.csv} \\
+\hline
+\end{tabular}
+}
+\caption{High-level system architecture of AgriSense.}
+\label{fig:architecture}
+\end{figure}
+
+\subsection{Crop Recommendation Module}
+
+\subsubsection{Problem Formulation}
+The crop recommendation task is formulated as a multi-class classification problem. Given an input feature vector $\mathbf{x} = [N, P, K, T, H, pH, R]^T \in \mathbb{R}^7$, where $N$, $P$, and $K$ represent soil macro-nutrient concentrations (mg/kg), $T$ denotes temperature (\textdegree C), $H$ denotes relative humidity (\%), $pH$ is the soil pH level, and $R$ is the annual rainfall (mm), the objective is to predict the optimal crop label $y \in \{c_1, c_2, \ldots, c_K\}$ from a set of $K$ crop classes.
+
+\subsubsection{Random Forest Classifier}
+We employ a Random Forest Classifier \cite{breiman2001} consisting of an ensemble of $B = 100$ decision trees. Each tree $h_b(\mathbf{x})$ in the ensemble is trained on a bootstrapped sample of the training data with random feature subsampling at each node split. The final classification is determined by majority voting:
+
+\begin{equation}
+\hat{y} = \arg\max_{c} \sum_{b=1}^{B} \mathbb{I}[h_b(\mathbf{x}) = c]
+\label{eq:rf_majority}
+\end{equation}
+
+where $\mathbb{I}[\cdot]$ is the indicator function.
+
+\subsubsection{Probabilistic Top-3 Recommendation}
+Rather than returning a single predicted crop, AgriSense provides the top-3 recommendations with associated probability scores. The class probability for crop $c$ is estimated as:
+
+\begin{equation}
+P(y = c \,|\, \mathbf{x}) = \frac{1}{B} \sum_{b=1}^{B} P_b(y = c \,|\, \mathbf{x})
+\label{eq:rf_proba}
+\end{equation}
+
+where $P_b(y = c \,|\, \mathbf{x})$ is the proportion of samples of class $c$ in the leaf node of tree $b$ to which $\mathbf{x}$ is assigned. The top-3 crops are selected as:
+
+\begin{equation}
+\text{Top-3} = \text{argsort}_{c}[-P(y = c \,|\, \mathbf{x})]_{1:3}
+\end{equation}
+
+A label encoder transforms between categorical crop names and numerical indices during training and inference.
+
+\subsection{Yield Prediction Module}
+
+\subsubsection{Problem Formulation}
+The yield prediction task is formulated as a regression problem. Given an input comprising both categorical features $\mathbf{x}_{\text{cat}} = [\text{Crop}, \text{Season}, \text{State}]$ and numerical features $\mathbf{x}_{\text{num}} = [\text{Area}, R_{\text{annual}}, F, P_{\text{pest}}]^T$, the objective is to predict the continuous yield value $y \in \mathbb{R}^+$.
+
+\subsubsection{Preprocessing Pipeline}
+A scikit-learn \texttt{ColumnTransformer} is employed to construct an automated preprocessing pipeline:
+
+\begin{equation}
+\phi(\mathbf{x}) = [\text{OneHot}(\mathbf{x}_{\text{cat}}) \,\|\, \mathbf{x}_{\text{num}}]
+\end{equation}
+
+where $\text{OneHot}(\cdot)$ applies One-Hot Encoding with \texttt{handle\_unknown=`ignore'} to handle unseen categories during inference gracefully, and $\|$ denotes vector concatenation. The encoded feature vector $\phi(\mathbf{x})$ is then passed to the regressor.
+
+\subsubsection{Random Forest Regressor}
+A Random Forest Regressor with $B = 50$ trees is employed. Each tree $h_b$ produces a continuous prediction, and the ensemble output is the average:
+
+\begin{equation}
+\hat{y} = \frac{1}{B} \sum_{b=1}^{B} h_b(\phi(\mathbf{x}))
+\label{eq:rf_regression}
+\end{equation}
+
+The entire preprocessing and regression pipeline is serialized as a single \texttt{pickle} object (\texttt{yield\_model.pkl}), ensuring consistent preprocessing during inference.
+
+\subsection{Profit Analysis Module}
+The profit analysis module computes the net farming profit using a straightforward economic model:
+
+\begin{equation}
+\text{Profit} = (\hat{y} \times p_{\text{market}}) - C_{\text{total}}
+\end{equation}
+
+where $\hat{y}$ is the estimated yield, $p_{\text{market}}$ is the per-unit market price, and $C_{\text{total}}$ is the total production cost. Results are presented alongside a breakdown of gross revenue and costs.
+
+\subsection{Risk Assessment Module}
+The risk assessment module employs a heuristic-based scoring system that evaluates agricultural risk based on rainfall ($R$) and fertilizer input ($F$):
+
+\begin{equation}
+S_{\text{risk}} = f_R(R) + f_F(F)
+\end{equation}
+
+where the component scoring functions are defined as:
+
+\begin{equation}
+f_R(R) = \begin{cases}
+2, & \text{if } R < 500 \text{ or } R > 2500 \\
+1, & \text{if } 500 \leq R < 1000 \text{ or } 2000 < R \leq 2500 \\
+0, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+\begin{equation}
+f_F(F) = \begin{cases}
+2, & \text{if } F < 50 \\
+1, & \text{if } 50 \leq F < 100 \\
+0, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+The risk level is then determined by:
+
+\begin{equation}
+\text{Risk Level} = \begin{cases}
+\text{High}, & \text{if } S_{\text{risk}} \geq 3 \\
+\text{Medium}, & \text{if } S_{\text{risk}} = 2 \\
+\text{Low}, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+This heuristic is designed to penalize extreme environmental conditions---both insufficient and excessive rainfall or fertilizer inputs---that are known to adversely impact crop performance.
+
+\subsection{Crop Comparison Module}
+The comparative analysis module evaluates the profitability of two crops side by side. For crops $A$ and $B$, the profit differential is computed as:
+
+\begin{equation}
+\Delta_{\text{profit}} = |\text{Profit}_A - \text{Profit}_B|
+\end{equation}
+
+and the superior crop is identified as:
+
+\begin{equation}
+\text{Better Crop} = \begin{cases}
+A, & \text{if } \text{Profit}_A > \text{Profit}_B \\
+B, & \text{otherwise}
+\end{cases}
+\end{equation}
+
+\subsection{Generative AI Insight Engine}
+A distinctive feature of AgriSense is the integration of Google Gemini 2.5 Flash \cite{google2024gemini} for generating natural-language insights. For each module, contextual prompts are dynamically constructed incorporating the model outputs and input parameters. The prompt is transmitted to the Gemini API endpoint, which generates a detailed, human-readable advisory. Formally:
+
+\begin{equation}
+\text{Insight} = \text{Gemini}(\text{Prompt}(\mathbf{x}, \hat{y}, \text{context}))
+\end{equation}
+
+where $\text{Prompt}(\cdot)$ is a template function that embeds numerical results into a natural-language query, and $\text{Gemini}(\cdot)$ denotes the generative model's text generation capability. This bridges the critical gap between opaque numerical outputs and farmer-comprehensible advisories.

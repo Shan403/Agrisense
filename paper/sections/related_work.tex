@@ -1,0 +1,21 @@
+% ============================================================
+% Section II: Related Work
+% ============================================================
+
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Machine Learning in Agriculture}
+Machine learning applications in agriculture have witnessed exponential growth over the past decade. Liakos et al. \cite{liakos2018} provided a comprehensive review of ML techniques applied to crop management, livestock management, water management, and soil management. They identified Random Forest, Support Vector Machines (SVM), and Artificial Neural Networks (ANN) as the most frequently employed algorithms.
+
+In the domain of crop recommendation, Pudumalar et al. \cite{pudumalar2017} proposed an ensemble approach combining Na\"ive Bayes, Random Forest, SVM, and K-Nearest Neighbors (KNN) to recommend crops based on soil nutrient levels and climatic parameters. Their study demonstrated that Random Forest consistently outperformed other classifiers, achieving accuracy rates exceeding 95\% on standard agricultural datasets. Similarly, Rajak et al. \cite{rajak2017} employed decision tree-based methods for crop selection, leveraging soil composition and weather forecasts as input features.
+
+For yield prediction, Chlingaryan et al. \cite{chlingaryan2018} reviewed ML approaches for crop yield prediction and found that ensemble methods, particularly Random Forest and Gradient Boosting, provided the best trade-off between accuracy and interpretability. Crane-Droesch \cite{crane2018} extended this work by incorporating deep learning techniques, though the computational overhead and data requirements often made them impractical for small-scale deployment.
+
+\subsection{Generative AI in Agricultural Advisory}
+The integration of LLMs in agricultural contexts is a relatively nascent but rapidly evolving field. Brown et al. \cite{brown2020} demonstrated the general-purpose capabilities of large language models, while subsequent work has explored their application to domain-specific advisory systems. Tzachor et al. \cite{tzachor2023} investigated the potential of foundation models for food security and sustainable agriculture, highlighting both opportunities and risks. Google's Gemini models \cite{google2024gemini} represent the latest generation of multimodal LLMs capable of processing and generating text, code, and visual content, making them particularly suited for generating rich agricultural advisories.
+
+\subsection{Agricultural Decision Support Systems}
+Traditional DSS for agriculture, such as DSSAT (Decision Support System for Agrotechnology Transfer) \cite{jones2003} and APSIM (Agricultural Production Systems Simulator) \cite{holzworth2014}, primarily rely on process-based crop simulation models. While scientifically rigorous, these systems require extensive parameterization and are often inaccessible to smallholder farmers. Modern web-based platforms such as Plantix, FarmLogs, and CropIn have improved accessibility but typically focus on narrow use cases and lack integrated ML-driven analytics combined with natural-language interpretation.
+
+AgriSense differentiates itself by unifying classical ML prediction, generative AI interpretation, economic analysis, and risk assessment within a single, web-accessible platform built on a modern, extensible technology stack.
